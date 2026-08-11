@@ -1,7 +1,0 @@
-{
-    "name": "Tests",
-    "references": [],
-    "includePlatforms": [],
-    "excludePlatforms": [],
-    "optionalUnityReferences": ["TestAssemblies"]
-}
