@@ -3,10 +3,10 @@ using UnityEngine;
 /// <summary>
 /// Inimigo base: patrulha, detecta o jogador, persegue e ataca por contato.
 /// Serve de base para inimigos mais específicos (voadores, atiradores, etc.)
-/// via herança ou composição — mantido simples de propósito.
+/// via herança — os métodos de comportamento são virtuais de propósito.
 /// </summary>
 [RequireComponent(typeof(Rigidbody2D))]
-public class EnemyController : MonoBehaviour
+public class EnemyController : MonoBehaviour, IDamageable
 {
     [Header("Stats")]
     public int maxHealth = 3;
@@ -19,53 +19,75 @@ public class EnemyController : MonoBehaviour
     [Header("Patrulha")]
     public Transform patrolPointA;
     public Transform patrolPointB;
+    [Tooltip("Sem pontos de patrulha, anda até achar borda ou parede e volta.")]
+    public float patrolDistance = 3f;
 
     [Header("Detecção")]
-    public Transform groundCheck;
-    public Transform wallCheck;
+    public Transform groundCheck;   // à frente dos pés: detecta fim da plataforma
+    public Transform wallCheck;     // à frente do tronco: detecta parede
     public LayerMask groundLayer;
     public LayerMask playerLayer;
+    [Tooltip("Se ligado, o inimigo só persegue quem ele realmente enxerga.")]
+    public bool requireLineOfSight = true;
 
     [Header("Animação (opcional)")]
     public Animator animator;
     public SpriteRenderer spriteRenderer;
 
-    Rigidbody2D rb;
-    int health;
-    int facing = 1;
-    float attackTimer;
-    Transform target;
+    protected Rigidbody2D rb;
+    protected int health;
+    protected int facing = 1;
+    protected float attackTimer;
+    protected Transform target;
+    protected bool dying = false;
+
     Vector3 patrolTarget;
-    bool dying = false;
+    bool headingToB = true;
+    Vector3 spawnPos;
 
     public System.Action<EnemyController> Died;
 
-    void Awake()
+    protected virtual void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+
+        // a dificuldade mexe em quão rápido eles vêm e de quão longe percebem
+        moveSpeed *= GameSettings.VelocidadeDosInimigos();
+        detectRange *= GameSettings.AlcanceDeVisao();
+
         health = maxHealth;
-        if (patrolPointA != null) patrolTarget = patrolPointA.position;
+        spawnPos = transform.position;
+        patrolTarget = patrolPointB != null ? patrolPointB.position
+                                            : spawnPos + Vector3.right * patrolDistance;
     }
 
-    void Update()
+    protected virtual void Update()
     {
         if (dying) return;
         attackTimer = Mathf.Max(0f, attackTimer - Time.deltaTime);
 
         FindPlayer();
-        if (target != null)
-            ChaseAndAttack();
-        else
-            Patrol();
+        if (target != null) ChaseAndAttack();
+        else Patrol();
     }
 
-    void FindPlayer()
+    protected virtual void FindPlayer()
     {
         Collider2D hit = Physics2D.OverlapCircle(transform.position, detectRange, playerLayer);
-        target = hit != null ? hit.transform : null;
+        if (hit == null) { target = null; return; }
+
+        if (requireLineOfSight)
+        {
+            // sem isso o inimigo "vê" através de paredes e fica preso empurrando pedra
+            Vector2 origin = transform.position;
+            Vector2 dir = (Vector2)hit.transform.position - origin;
+            var blocked = Physics2D.Raycast(origin, dir.normalized, dir.magnitude, groundLayer);
+            if (blocked.collider != null) { target = null; return; }
+        }
+        target = hit.transform;
     }
 
-    void ChaseAndAttack()
+    protected virtual void ChaseAndAttack()
     {
         float dist = Mathf.Abs(target.position.x - transform.position.x);
         SetFacing(target.position.x > transform.position.x ? 1 : -1);
@@ -73,64 +95,138 @@ public class EnemyController : MonoBehaviour
         if (dist <= attackRange)
         {
             rb.velocity = new Vector2(0, rb.velocity.y);
-            if (attackTimer <= 0f)
+            TryContactAttack();
+        }
+        else if (HasFloorAhead() && !HasWallAhead())
+        {
+            rb.velocity = new Vector2(facing * moveSpeed, rb.velocity.y);
+        }
+        else
+        {
+            // não persegue para dentro de um buraco
+            rb.velocity = new Vector2(0, rb.velocity.y);
+        }
+    }
+
+    protected void TryContactAttack()
+    {
+        if (attackTimer > 0f) return;
+        var pc = target != null ? target.GetComponent<PlayerController>() : null;
+        if (pc != null) pc.TakeDamage(contactDamage, transform.position);
+        attackTimer = attackCooldown;
+    }
+
+    protected virtual void Patrol()
+    {
+        if (patrolPointA != null && patrolPointB != null)
+        {
+            if (Mathf.Abs(transform.position.x - patrolTarget.x) < 0.15f)
             {
-                var pc = target.GetComponent<PlayerController>();
-                if (pc != null) pc.TakeDamage(contactDamage, transform.position);
-                attackTimer = attackCooldown;
+                headingToB = !headingToB;
+                patrolTarget = headingToB ? patrolPointB.position : patrolPointA.position;
             }
         }
         else
         {
-            rb.velocity = new Vector2(facing * moveSpeed, rb.velocity.y);
-        }
-    }
-
-    void Patrol()
-    {
-        if (patrolPointA == null || patrolPointB == null)
-        {
-            rb.velocity = new Vector2(0, rb.velocity.y);
+            // sem pontos definidos: vira ao chegar na borda da plataforma ou na parede
+            if (!HasFloorAhead() || HasWallAhead()) SetFacing(-facing);
+            rb.velocity = new Vector2(facing * moveSpeed * 0.6f, rb.velocity.y);
+            PlayMoveAnim();
             return;
         }
-        float distToTarget = Mathf.Abs(transform.position.x - patrolTarget.x);
-        if (distToTarget < 0.1f)
-            patrolTarget = (patrolTarget == (Vector3)patrolPointA.position) ? patrolPointB.position : patrolPointA.position;
 
         int dir = patrolTarget.x > transform.position.x ? 1 : -1;
         SetFacing(dir);
+        if (!HasFloorAhead() || HasWallAhead())
+        {
+            // ponto de patrulha mal posicionado (do outro lado de um buraco)
+            headingToB = !headingToB;
+            patrolTarget = headingToB ? patrolPointB.position : patrolPointA.position;
+            rb.velocity = new Vector2(0, rb.velocity.y);
+            return;
+        }
         rb.velocity = new Vector2(dir * moveSpeed * 0.6f, rb.velocity.y);
+        PlayMoveAnim();
     }
 
-    void SetFacing(int dir)
+    protected virtual void PlayMoveAnim()
     {
-        if (dir != facing)
+        if (animator != null && Mathf.Abs(rb.velocity.x) > 0.05f) animator.Play("walk");
+    }
+
+    /// <summary>Existe chão logo à frente? Impede o inimigo de andar para fora da plataforma.</summary>
+    protected bool HasFloorAhead()
+    {
+        if (groundCheck == null) return true;
+        return Physics2D.Raycast(groundCheck.position, Vector2.down, 0.6f, groundLayer);
+    }
+
+    protected bool HasWallAhead()
+    {
+        if (wallCheck == null) return false;
+        return Physics2D.Raycast(wallCheck.position, Vector2.right * facing, 0.35f, groundLayer);
+    }
+
+    protected void SetFacing(int dir)
+    {
+        if (dir != 0 && dir != facing)
         {
             facing = dir;
             if (spriteRenderer != null) spriteRenderer.flipX = (facing < 0);
+            RepositionChecks();
         }
     }
 
-    public void TakeDamage(int amount, Vector2 sourcePos)
+    /// <summary>Espelha os pontos de checagem junto com o sprite.</summary>
+    void RepositionChecks()
+    {
+        if (groundCheck != null)
+        {
+            var lp = groundCheck.localPosition;
+            groundCheck.localPosition = new Vector3(Mathf.Abs(lp.x) * facing, lp.y, lp.z);
+        }
+        if (wallCheck != null)
+        {
+            var lp = wallCheck.localPosition;
+            wallCheck.localPosition = new Vector3(Mathf.Abs(lp.x) * facing, lp.y, lp.z);
+        }
+    }
+
+    public virtual void TakeDamage(int amount, Vector2 sourcePos)
     {
         if (dying) return;
         health -= amount;
         if (animator != null) animator.Play("hurt");
-        Vector2 kb = new Vector2(Mathf.Sign(transform.position.x - sourcePos.x) * 3f, 2f);
-        rb.velocity = kb;
+        float dir = Mathf.Sign(transform.position.x - sourcePos.x);
+        if (dir == 0f) dir = -facing;
+        rb.velocity = new Vector2(dir * 3f, 2f);
         if (health <= 0) Die();
+        else StartCoroutine(FlashRoutine());
     }
 
-    void Die()
+    System.Collections.IEnumerator FlashRoutine()
+    {
+        if (spriteRenderer == null) yield break;
+        var original = spriteRenderer.color;
+        spriteRenderer.color = Color.red;
+        yield return new WaitForSeconds(0.09f);
+        if (spriteRenderer != null) spriteRenderer.color = original;
+    }
+
+    protected virtual void Die()
     {
         dying = true;
+        rb.velocity = Vector2.zero;
         if (animator != null) animator.Play("death");
+        // desliga a colisão para o cadáver não continuar empurrando o jogador
+        foreach (var c in GetComponentsInChildren<Collider2D>()) c.enabled = false;
         Died?.Invoke(this);
-        Destroy(gameObject, 0.4f);
+        Destroy(gameObject, 0.6f);
     }
 
     public int Health => health;
     public bool Dying => dying;
+    public int Facing => facing;
 
     void OnDrawGizmosSelected()
     {
