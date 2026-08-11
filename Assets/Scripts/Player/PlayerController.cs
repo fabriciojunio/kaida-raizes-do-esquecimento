@@ -18,6 +18,10 @@ public class PlayerController : MonoBehaviour
     public float groundCheckRadius = 0.15f;
     public LayerMask groundLayer;
 
+    [Header("Detecção de parede (habilidade wall_climb)")]
+    public Transform wallCheck;            // um filho vazio na altura do tronco
+    public float wallCheckDistance = 0.28f;
+
     [Header("Combate")]
     public Transform attackPoint;          // ponto à frente do jogador
     public float attackRadius = 0.6f;
@@ -39,6 +43,7 @@ public class PlayerController : MonoBehaviour
     [HideInInspector] public bool isInvulnerable = false;
     [HideInInspector] public bool canDash = true;
     [HideInInspector] public int airDashesLeft = 0;
+    [HideInInspector] public int airJumpsLeft = 0;    // pulo duplo (habilidade double_jump)
 
     // timers
     [HideInInspector] public float coyoteTimer = 0f;
@@ -52,7 +57,15 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         rb.gravityScale = 0f; // gravidade controlada manualmente (game feel)
         rb.freezeRotation = true;
-        if (stats == null) stats = ScriptableObject.CreateInstance<PlayerStats>();
+        // Trabalha sempre sobre uma cópia. O asset PlayerStats é compartilhado
+        // e fica no disco: sem clonar, a dificuldade escolhida e cada Nódulo
+        // de Vida pego ficariam gravados no projeto e vazariam para a próxima
+        // partida (e para o repositório).
+        stats = stats == null
+            ? ScriptableObject.CreateInstance<PlayerStats>()
+            : Instantiate(stats);
+
+        GameSettings.Aplicar(stats);
         health = stats.maxHealth;
 
         BuildStateMachine();
@@ -76,6 +89,17 @@ public class PlayerController : MonoBehaviour
         Machine.Add("attack", new PlayerAttackState(this));
         Machine.Add("hurt",   new PlayerHurtState(this));
         Machine.Add("dead",   new PlayerDeadState(this));
+        Machine.Add("wallcling", new PlayerWallClingState(this));
+    }
+
+    /// <summary>
+    /// Consulta uma habilidade desbloqueada. Se não existe SaveSystem na cena
+    /// (ex.: cena de teste isolada), considera tudo liberado para não travar.
+    /// </summary>
+    public bool HasAbility(string id)
+    {
+        if (SaveSystem.Instance == null) return true;
+        return SaveSystem.Instance.HasAbility(id);
     }
 
     void Update()
@@ -94,6 +118,7 @@ public class PlayerController : MonoBehaviour
         coyoteTimer = Mathf.Max(0f, coyoteTimer - dt);
         jumpBufferTimer = Mathf.Max(0f, jumpBufferTimer - dt);
         dashCooldownTimer = Mathf.Max(0f, dashCooldownTimer - dt);
+        wallJumpLockTimer = Mathf.Max(0f, wallJumpLockTimer - dt);
         if (dashCooldownTimer == 0f) canDash = true;
     }
 
@@ -105,6 +130,36 @@ public class PlayerController : MonoBehaviour
     }
 
     public float InputX => Input.GetAxisRaw("Horizontal");
+
+    /// <summary>Parede à frente na direção que o jogador encara.</summary>
+    public bool IsTouchingWall()
+    {
+        if (wallCheck == null) return false;
+        return Physics2D.Raycast(wallCheck.position, Vector2.right * facing, wallCheckDistance, groundLayer);
+    }
+
+    /// <summary>Condição de agarrar na parede: habilidade + parede + no ar + caindo ou empurrando.</summary>
+    public bool CanWallCling()
+    {
+        return HasAbility("wall_climb") && IsTouchingWall() && !IsGrounded()
+               && Mathf.Abs(InputX) > 0.01f && Mathf.Sign(InputX) == facing;
+    }
+
+    /// <summary>Pulo no ar disponível (habilidade double_jump).</summary>
+    public bool CanAirJump() => HasAbility("double_jump") && airJumpsLeft > 0;
+
+    /// <summary>
+    /// Marca que o próximo "jump" é um pulo aéreo. O PlayerJumpState lê a flag
+    /// no Enter para aplicar a força reduzida em vez da força de pulo do chão.
+    /// </summary>
+    [HideInInspector] public bool pendingAirJump = false;
+    [HideInInspector] public float wallJumpLockTimer = 0f;
+
+    public void ConsumeAirJump()
+    {
+        airJumpsLeft--;
+        pendingAirJump = true;
+    }
 
     public void ApplyGravity(float dt)
     {
@@ -155,17 +210,25 @@ public class PlayerController : MonoBehaviour
         return false;
     }
     public bool CanCoyoteJump() => coyoteTimer > 0f;
-    public void RefreshAirAbilities() { airDashesLeft = stats.airDashes; }
+    public void RefreshAirAbilities()
+    {
+        airDashesLeft = stats.airDashes;
+        airJumpsLeft = HasAbility("double_jump") ? stats.airJumps : 0;
+    }
 
     // ---------- combate ----------
     public void DoAttackHit()
     {
         if (attackPoint == null) return;
         Collider2D[] hits = Physics2D.OverlapCircleAll(attackPoint.position, attackRadius, enemyLayer);
+        // um inimigo pode ter vários colliders: só conta um golpe por alvo
+        var atingidos = new System.Collections.Generic.HashSet<object>();
         foreach (var h in hits)
         {
-            var e = h.GetComponentInParent<EnemyController>();
-            if (e != null) e.TakeDamage(stats.attackDamage, transform.position);
+            var alvo = h.GetComponentInParent<IDamageable>();
+            if (alvo == null || atingidos.Contains(alvo)) continue;
+            atingidos.Add(alvo);
+            alvo.TakeDamage(stats.attackDamage, transform.position);
         }
     }
 
@@ -188,17 +251,43 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Liga a invulnerabilidade e agenda o desligamento. O estado Hurt chama isso
+    /// ao sair do knockback, para o jogador ter uma janela de recuperação.
+    /// </summary>
     public void StartInvulnWindow()
     {
         if (invulnCoroutine != null) StopCoroutine(invulnCoroutine);
+        isInvulnerable = true;
         invulnCoroutine = StartCoroutine(InvulnWindowRoutine());
     }
     Coroutine invulnCoroutine;
     System.Collections.IEnumerator InvulnWindowRoutine()
     {
-        yield return new WaitForSeconds(stats.invulnTime);
+        // pisca o sprite enquanto dura a janela, para o jogador ler o estado
+        float elapsed = 0f;
+        while (elapsed < stats.invulnTime)
+        {
+            if (spriteRenderer != null)
+                spriteRenderer.enabled = !spriteRenderer.enabled;
+            yield return new WaitForSeconds(0.08f);
+            elapsed += 0.08f;
+        }
+        if (spriteRenderer != null) spriteRenderer.enabled = true;
+        isInvulnerable = false;
+        invulnCoroutine = null;
+    }
+
+    /// <summary>Cancela a janela de invulnerabilidade (usado no respawn).</summary>
+    public void CancelInvulnWindow()
+    {
+        if (invulnCoroutine != null) { StopCoroutine(invulnCoroutine); invulnCoroutine = null; }
+        if (spriteRenderer != null) spriteRenderer.enabled = true;
         isInvulnerable = false;
     }
+
+    /// <summary>Reemite o evento de vida (HUD reconstrói após respawn/troca de cena).</summary>
+    public void NotifyHealthChanged() => HealthChanged?.Invoke(health, stats.maxHealth);
 
     public void Heal(int amount)
     {
@@ -220,6 +309,11 @@ public class PlayerController : MonoBehaviour
         {
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(attackPoint.position, attackRadius);
+        }
+        if (wallCheck != null)
+        {
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawLine(wallCheck.position, wallCheck.position + Vector3.right * facing * wallCheckDistance);
         }
     }
 }

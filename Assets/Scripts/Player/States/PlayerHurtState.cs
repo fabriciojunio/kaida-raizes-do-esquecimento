@@ -28,9 +28,10 @@ public class PlayerHurtState : State
     {
         if (timer <= 0f)
         {
-            machine.ChangeState(p.IsGrounded() ? "idle" : "fall");
-            // invulnerabilidade continua um pouco além do knockback (stats.invulnTime)
+            // liga a janela ANTES de trocar de estado: o Enter do próximo estado
+            // não pode rodar com o jogador momentaneamente vulnerável
             p.StartInvulnWindow();
+            machine.ChangeState(p.IsGrounded() ? "idle" : "fall");
         }
     }
 }

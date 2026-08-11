@@ -19,6 +19,15 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
+    /// <summary>
+    /// Quando existe uma tela de game over na cena, ela desliga isto e passa
+    /// a decidir quando o jogador volta.
+    /// </summary>
+    public bool respawnAutomatico = true;
+
+    /// <summary>Avisa quem estiver interessado (a tela de morte, por exemplo).</summary>
+    public event System.Action PlayerMorreu;
+
     public void RegisterPlayer(PlayerController player)
     {
         PlayerRef = player;
@@ -33,15 +42,19 @@ public class GameManager : MonoBehaviour
 
     void OnPlayerDied()
     {
-        Invoke(nameof(RespawnPlayer), 1.0f);
+        PlayerMorreu?.Invoke();
+        if (respawnAutomatico) Invoke(nameof(RespawnPlayer), 1.0f);
     }
 
     public void RespawnPlayer()
     {
         if (PlayerRef == null) return;
         PlayerRef.transform.position = CurrentCheckpoint;
+        PlayerRef.SetVelocity(0f, 0f);                 // senão o jogador reaparece caindo
         PlayerRef.health = PlayerRef.stats.maxHealth;
-        PlayerRef.isInvulnerable = false;
+        PlayerRef.CancelInvulnWindow();
+        PlayerRef.RefreshAirAbilities();
+        PlayerRef.NotifyHealthChanged();               // sem isso a HUD fica zerada após morrer
         PlayerRef.Machine.ChangeState("idle");
     }
 }

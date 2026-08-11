@@ -8,7 +8,10 @@ public class PlayerJumpState : State
 
     public override void Enter()
     {
-        p.SetVelocityY(p.stats.JumpVelocity);
+        // pulo aéreo (double_jump) sai um pouco mais fraco que o pulo do chão
+        float power = p.pendingAirJump ? p.stats.airJumpPower : 1f;
+        p.pendingAirJump = false;
+        p.SetVelocityY(p.stats.JumpVelocity * power);
         p.coyoteTimer = 0f;
         p.PlayAnim("jump");
     }
@@ -16,7 +19,10 @@ public class PlayerJumpState : State
     public override void PhysicsUpdate()
     {
         p.ApplyGravity(Time.fixedDeltaTime);
-        p.ApplyHorizontal(Time.fixedDeltaTime, p.InputX, p.stats.airAccel, p.stats.airDecel);
+        // logo após um salto de parede o controle fica travado, senão o jogador
+        // "gruda" de volta na parede segurando a direção
+        if (p.wallJumpLockTimer <= 0f)
+            p.ApplyHorizontal(Time.fixedDeltaTime, p.InputX, p.stats.airAccel, p.stats.airDecel);
     }
 
     public override void LogicUpdate()
@@ -24,8 +30,16 @@ public class PlayerJumpState : State
         if (Input.GetButtonUp("Jump") && p.rb.velocity.y > 0)
             p.SetVelocityY(p.rb.velocity.y * p.stats.jumpCutMultiplier);
 
+        // segundo pulo no ar, sem sair do estado (só reaplica a força)
+        if (Input.GetButtonDown("Jump") && p.CanAirJump())
+        {
+            p.ConsumeAirJump();
+            Enter();
+            return;
+        }
+        if (p.CanWallCling() && p.rb.velocity.y <= 0f) { machine.ChangeState("wallcling"); return; }
         if (p.rb.velocity.y <= 0) { machine.ChangeState("fall"); return; }
-        if (Input.GetKeyDown(KeyCode.LeftShift) && p.canDash) { machine.ChangeState("dash"); return; }
+        if (Input.GetKeyDown(KeyCode.LeftShift) && p.canDash && p.airDashesLeft > 0) { machine.ChangeState("dash"); return; }
         if (Input.GetButtonDown("Fire1")) { machine.ChangeState("attack"); return; }
     }
 }

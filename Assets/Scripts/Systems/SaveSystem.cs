@@ -45,9 +45,30 @@ public class SaveSystem : MonoBehaviour
     public bool LoadGame()
     {
         if (!HasSave()) return false;
-        Data = JsonUtility.FromJson<SaveData>(System.IO.File.ReadAllText(SavePath));
-        GameManager.Instance.SetCheckpoint(new Vector2(Data.checkpointX, Data.checkpointY), Data.room);
+        try
+        {
+            var loaded = JsonUtility.FromJson<SaveData>(System.IO.File.ReadAllText(SavePath));
+            if (loaded == null) return false;
+            Data = loaded;
+            if (Data.unlockedAbilities == null) Data.unlockedAbilities = new List<string>();
+            if (Data.collectedItems == null) Data.collectedItems = new List<string>();
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning("Save corrompido, começando do zero: " + e.Message);
+            Data = new SaveData();
+            return false;
+        }
+        if (GameManager.Instance != null)
+            GameManager.Instance.SetCheckpoint(new Vector2(Data.checkpointX, Data.checkpointY), Data.room);
         return true;
+    }
+
+    /// <summary>Apaga o progresso (usado pelo menu e pelos testes).</summary>
+    public void DeleteSave()
+    {
+        if (HasSave()) System.IO.File.Delete(SavePath);
+        Data = new SaveData();
     }
 
     public bool HasAbility(string id) => Data.unlockedAbilities.Contains(id);

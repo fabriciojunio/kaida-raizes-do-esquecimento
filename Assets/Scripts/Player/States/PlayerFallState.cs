@@ -11,12 +11,14 @@ public class PlayerFallState : State
     public override void PhysicsUpdate()
     {
         p.ApplyGravity(Time.fixedDeltaTime);
-        p.ApplyHorizontal(Time.fixedDeltaTime, p.InputX, p.stats.airAccel, p.stats.airDecel);
+        if (p.wallJumpLockTimer <= 0f)
+            p.ApplyHorizontal(Time.fixedDeltaTime, p.InputX, p.stats.airAccel, p.stats.airDecel);
     }
 
     public override void LogicUpdate()
     {
-        if (Input.GetButtonDown("Jump")) p.BufferJump();
+        bool jumpPressed = Input.GetButtonDown("Jump");
+        if (jumpPressed) p.BufferJump();
 
         if (p.IsGrounded())
         {
@@ -25,8 +27,15 @@ public class PlayerFallState : State
             machine.ChangeState(Mathf.Abs(p.InputX) > 0.01f ? "run" : "idle");
             return;
         }
-        if (Input.GetButtonDown("Jump") && p.CanCoyoteJump()) { machine.ChangeState("jump"); return; }
-        if (Input.GetKeyDown(KeyCode.LeftShift) && p.canDash) { machine.ChangeState("dash"); return; }
+        if (p.CanWallCling()) { machine.ChangeState("wallcling"); return; }
+
+        if (jumpPressed)
+        {
+            // coyote time tem prioridade: ainda conta como pulo "do chão"
+            if (p.CanCoyoteJump()) { p.ConsumeJumpBuffer(); machine.ChangeState("jump"); return; }
+            if (p.CanAirJump()) { p.ConsumeJumpBuffer(); p.ConsumeAirJump(); machine.ChangeState("jump"); return; }
+        }
+        if (Input.GetKeyDown(KeyCode.LeftShift) && p.canDash && p.airDashesLeft > 0) { machine.ChangeState("dash"); return; }
         if (Input.GetButtonDown("Fire1")) { machine.ChangeState("attack"); return; }
     }
 }
