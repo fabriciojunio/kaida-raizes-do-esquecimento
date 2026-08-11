@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/00_MenuPrincipal.unity
+    guid: c6e4a87f5baa5c146ba94f8a4edb778d
+  - enabled: 1
+    path: Assets/Scenes/01_OrlaDaVila.unity
+    guid: 21c2cd6b279a7c14a8b22633576b6a0b
+  - enabled: 1
+    path: Assets/Scenes/02_FlorestaSilente.unity
+    guid: 2b9460c5a09604c4ebd7d61b3f91570b
+  - enabled: 1
+    path: Assets/Scenes/03_LagoSilente.unity
+    guid: eeb93db11ccf155499c9dfb18f04f8b2
+  - enabled: 1
+    path: Assets/Scenes/04_CavernaMusgosa.unity
+    guid: b6f79c2d5122ef94fa07cc4757552c39
+  - enabled: 1
+    path: Assets/Scenes/05_SantuarioEsquecido.unity
+    guid: 0d366f083ac200e4da6e7f0c4b2ea379
+  m_configObjects: {}

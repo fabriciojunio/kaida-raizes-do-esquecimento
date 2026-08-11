@@ -37,3 +37,9 @@ crashlytics-build.properties
 # OS
 .DS_Store
 Thumbs.db
+
+# Capturas geradas para conferencia visual
+/[Cc]apturas/
+
+# Resultados de teste
+/Logs/
