@@ -43,3 +43,6 @@ Thumbs.db
 
 # Resultados de teste
 /Logs/
+
+# Cenas temporarias criadas pelo Test Runner
+/[Aa]ssets/InitTestScene*
