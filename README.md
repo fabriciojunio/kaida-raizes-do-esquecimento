@@ -1,28 +1,56 @@
 # Kaida — Raízes do Esquecimento
 
-Metroidvania 2D feito em Unity 2022.3. Kaida acorda na orla de um vale que
-esqueceu de si mesmo e vai atrás do que restou da própria memória.
+Metroidvania 2D desenvolvido em Unity 2022.3 para a disciplina de
+Desenvolvimento de Jogos Digitais, do curso de Ciência da Computação.
 
-## Jogar
+Kaida acorda na orla de um vale que esqueceu de si mesmo e vai atrás do que
+restou da própria memória.
 
-Se você só quer jogar, rode `Build\Kaida.exe`.
+## Integrantes do grupo
 
-## Abrir no editor
+- Fabrício Júnio Almeida Dias
+- Camila Pereira Raimundo
+- Luan Miranda Padilha
+- Kauã Limão Nunes
 
-1. Abra o projeto no Unity **2022.3.62f3** (Unity Hub → Add → aponte para
-   esta pasta).
-2. Na barra de menus aparece um menu **Kaida**. Clique em **Kaida → MONTAR
-   TUDO**. Isso fatia os sprites, gera as animações, os prefabs, os tiles e
-   as seis cenas.
-3. Abra `Assets/Scenes/00_MenuPrincipal.unity` e aperte Play.
+## Como jogar
 
-Pela linha de comando dá para fazer tudo de uma vez, incluindo os testes:
+### Opção 1 — baixar o jogo pronto (recomendado)
 
-```powershell
-.\montar.ps1            # monta e roda os testes
-.\montar.ps1 -Build     # monta, testa e gera Build\Kaida.exe
-.\montar.ps1 -SoTestes  # só os testes
-```
+Baixe o arquivo `Kaida-Windows.zip` na página de
+[**Releases**](https://github.com/fabriciojunio/kaida-raizes-do-esquecimento/releases/latest),
+extraia a pasta e execute **`Kaida.exe`**.
+
+Não é preciso instalar mais nada. O jogo é para **Windows 64 bits**.
+
+> Se o Windows exibir o aviso "O Windows protegeu o seu computador", clique
+> em **Mais informações → Executar assim mesmo**. Isso acontece porque o
+> executável não tem assinatura digital paga, não porque haja algo errado
+> com o arquivo.
+
+### Opção 2 — abrir o projeto na engine
+
+1. Instale o **Unity 2022.3.62f3** pelo Unity Hub.
+2. No Unity Hub, clique em **Add** e aponte para a pasta deste projeto.
+3. Abra o projeto. Na barra de menus aparece o menu **Kaida**.
+4. Clique em **Kaida → MONTAR TUDO**. Esse passo fatia os sprites, gera as
+   animações, os prefabs, os tiles e as seis cenas.
+5. Abra `Assets/Scenes/00_MenuPrincipal.unity` e aperte **Play**.
+
+O passo 4 é necessário porque o projeto gera os assets a partir do código
+(veja *Como o jogo é montado*, mais abaixo).
+
+## Requisitos mínimos
+
+| | |
+|---|---|
+| Sistema | Windows 10 ou 11, 64 bits |
+| Processador | Dual core 2.0 GHz |
+| Memória | 4 GB de RAM |
+| Vídeo | Placa integrada com suporte a DirectX 11 |
+| Espaço | 250 MB livres |
+
+O jogo assume a resolução do monitor onde for aberto, de 4:3 a ultrawide.
 
 ## Controles
 
@@ -35,95 +63,75 @@ Pela linha de comando dá para fazer tudo de uma vez, incluindo os testes:
 | Pausar | Esc |
 
 Pulo duplo e escalada de parede só funcionam depois de encontrar a
-habilidade no mapa — é um metroidvania.
+habilidade correspondente no mapa — é um metroidvania.
 
-## Telas
+## O jogo
 
-- **Menu principal**: novo jogo, continuar, dificuldade, controles, sair.
-  O botão *Continuar* fica desligado enquanto não existe um save.
-- **Dificuldade**: Fácil, Normal e Difícil. Muda a vida máxima da Kaida, o
-  tamanho da janela de invulnerabilidade e a velocidade e o alcance de
-  visão dos inimigos.
-- **Pausa** (Esc): continuar, reiniciar a região, voltar ao menu, sair.
-- **Morte**: volta ao último marco de descanso ou ao menu.
-- **Vitória**: aparece ao derrotar o Guardião, com o balanço de fragmentos,
-  nódulos e habilidades encontrados.
-
-## O mapa
+Cinco regiões conectadas, percorridas nos dois sentidos:
 
 ```
 Orla da Vila → Floresta Silente → Lago Silente → Caverna Musgosa → Santuário
  (tutorial)      (pulo duplo)      (travessia)    (escalada parede)   (chefe)
 ```
 
-As passagens funcionam nos dois sentidos: dá para voltar e alcançar o que
-antes estava fora de alcance.
+- **3 tipos de inimigo**, cada um com padrão próprio: o javali telegrafa e
+  investe, a abelha mergulha em diagonal, o caracol se fecha na casca e
+  fica imune por um tempo
+- **Chefe final em três fases**, cada uma cobrando uma habilidade diferente
+- **Três dificuldades**, que mudam vida, invulnerabilidade e o
+  comportamento dos inimigos
+- **Colecionáveis**: fragmentos de lore e nódulos que aumentam a vida máxima
+- **Save automático** nos marcos de descanso
 
-## Estrutura
+## Documentação
+
+- [`docs/GDD.md`](docs/GDD.md) — Game Design Document
+- [`docs/CONTRIBUICOES.md`](docs/CONTRIBUICOES.md) — divisão de tarefas
+- [`CREDITOS.md`](CREDITOS.md) — origem e licença dos assets
+
+Os créditos também aparecem **dentro do jogo**, pelo menu principal.
+
+## Como o jogo é montado
+
+As cenas não foram montadas arrastando objetos na tela: são geradas por
+código a partir de mapas em texto, em `Assets/Editor/SceneBuilder.cs`. Cada
+caractere é um tile de uma unidade.
+
+```
+"..............P....C..................B.............B........>..",
+"################################################################",
+```
+
+Editar o mapa e rodar **Kaida → MONTAR TUDO** regenera a região inteira.
+Além de ser mais rápido que posicionar objeto por objeto, o level design
+fica versionado como texto, o que permite revisar mudanças no Git.
+
+## Estrutura do projeto
 
 ```
 Assets/
   Scripts/
-    Player/       PlayerController + um arquivo por estado (idle, run, jump,
-                  fall, dash, attack, hurt, dead, wallcling)
-    Enemies/      EnemyController base + javali, abelha, caracol
-    Enemies/Boss/ O Guardião do Lúmen e suas três fases
-    Systems/      máquina de estados, save, checkpoint, troca de cena
+    Player/       PlayerController e um arquivo por estado
+    Enemies/      inimigo base, os três tipos e o chefe
+    Systems/      máquina de estados, save, câmera, trilha, cursor
     World/        coletáveis, perigos, transições, parallax
-    UI/           vida, mensagens, barra do chefe
-  Editor/         os geradores (sprites, animações, prefabs, tiles, cenas)
-  Tests/
-    EditMode/     lógica pura e integridade do projeto
-    PlayMode/     comportamento com física rodando
-  Art/            os sprites já organizados por personagem/região
-docs/             GDD, brief e guias
+    UI/           menus, HUD, créditos, telas de fim de jogo
+  Editor/         geradores de sprites, animações, prefabs, tiles e cenas
+  Tests/          EditMode e PlayMode
+  Art/            sprites organizados por personagem e região
+docs/             GDD e divisão de tarefas
 ```
-
-### Sobre a pasta `Editor/`
-
-As cenas não foram montadas à mão: são geradas por código a partir de mapas
-em texto dentro de `Assets/Editor/SceneBuilder.cs`. Cada caractere é um tile.
-
-```
-"....P....C..........B...................B.....................>.",
-"#######################....#####################################",
-```
-
-Editar o mapa e rodar **Kaida → MONTAR TUDO** de novo regenera a região
-inteira. É bem mais rápido do que arrastar objetos na tela, e o level design
-fica versionado como texto em vez de binário.
 
 ## Testes
 
-138 casos, todos passando.
+138 casos automatizados, todos passando.
 
 ```
-EditMode   75/75
-PlayMode   63/63
+EditMode   75/75      lógica e integridade do projeto
+PlayMode   63/63      comportamento com a física rodando
 ```
 
-**EditMode** — lógica sem cena, e verificação de que o projeto gerado bate
-com o que o código espera. O caso mais útil: conferir que todo nome passado
-para `PlayAnim("...")` existe mesmo no Animator. A Unity não reclama quando
-falta um estado, a animação só não toca.
-
-**PlayMode** — comportamento real, com a física rodando: a queda, a altura
-do pulo, o alcance do dash, o knockback, o respawn, o inimigo que não anda
-para fora da plataforma, as três fases do chefe, a dificuldade e a pausa.
-
-Boa parte dos testes nasceu de defeito encontrado jogando, e ficou para
-não deixar voltar:
-
-- **alcance dos mapas**: um validador percorre as superfícies a partir do
-  ponto de partida e reprova a região se alguma plataforma, item ou
-  passagem ficar ilhado. Ele reprovou as cinco regiões da primeira versão
-- **chão com colisão**: carrega cada região, solta a Kaida e mede se ela
-  cai. Chão sem colisão não aparece em captura nenhuma — o cenário fica
-  perfeito e o jogador atravessa o mundo
-- **confronto com o chefe**: na cena real, não com um chefe montado à mão.
-  O simplificado passava enquanto o do jogo era intocável
-- **pivô das animações**: confere que os pés ficam alinhados entre idle,
-  corrida e ataque, senão a personagem sobe meia unidade ao bater
+Para rodar:
 
 ```powershell
 .\montar.ps1 -SoTestes
@@ -131,35 +139,28 @@ não deixar voltar:
 
 Ou pelo editor: **Window → General → Test Runner**.
 
-## Requisitos
+Boa parte dos testes nasceu de defeito encontrado jogando, e ficou para não
+deixar voltar:
 
-- Unity **2022.3.62f3** com suporte 2D
-- Pacotes (já em `Packages/manifest.json`): 2D Tilemap, 2D Sprite,
-  Test Framework, uGUI
-
-## Documentação
-
-- `docs/GDD_HISTORIA_E_DESIGN.md` — história, mundo, inimigos, progressão
-- `docs/ESTADO_DO_PROJETO.md` — o que existe e o que ainda dá para fazer
-- `CREDITOS.md` — de onde vem cada asset e sob qual licença
+- **alcance dos mapas** — percorre as superfícies a partir do ponto de
+  partida e reprova a região se alguma plataforma, item ou passagem ficar
+  fora de alcance
+- **chão com colisão** — carrega cada região, solta a personagem e mede se
+  ela cai. Chão sem colisão não aparece em captura de tela nenhuma
+- **confronto com o chefe** — na cena real, porque um chefe montado à mão
+  passava enquanto o do jogo estava inalcançável
+- **pivô das animações** — confere que os pés ficam alinhados entre idle,
+  corrida e ataque
 
 ## Trilha sonora
 
-Os pacotes de arte não trazem áudio, então a música é **gerada por síntese**
-em tempo de execução (`Assets/Scripts/Systems/TrilhaSonora.cs`): escala
-menor, arpejo lento e um baixo sustentado embaixo. Cada região tem tônica e
-andamento próprios — a Vila mais clara, o Santuário grave e arrastado.
-
-O volume é baixo de propósito, e dá para ajustar em **Tela e som**, no menu.
-
-## Em qualquer tela
-
-O jogo abre assumindo a resolução do monitor onde estiver rodando. A câmera
-calcula a margem pela proporção real da tela, então nem um ultrawide 21:9
-nem um projetor 4:3 mostram para fora do cenário; a interface acompanha a
-altura, e nada é cortado.
+Os pacotes de arte não incluem áudio, então a música é **gerada por síntese
+em tempo de execução** (`Assets/Scripts/Systems/TrilhaSonora.cs`): escala
+menor, arpejo lento e baixo sustentado, com tônica e andamento próprios
+para cada região. O volume pode ser ajustado no menu.
 
 ## Créditos de arte
 
 A arte vem do pacote **Legacy Fantasy — High Forest**, de **Anokolisa**
-(gratuito, uso comercial permitido). Detalhes em `CREDITOS.md`.
+(gratuito, uso comercial permitido), e do **Stringstar Fields**. Detalhes em
+[`CREDITOS.md`](CREDITOS.md).

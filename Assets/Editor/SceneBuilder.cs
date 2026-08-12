@@ -316,14 +316,31 @@ public static class SceneBuilder
         desfoque.raio = 5.5f;
         desfoque.escurecer = 0.34f;
 
+        // Tela de créditos: exigência da entrega, que pede a fonte dos assets
+        // dentro do próprio jogo, não só no relatório.
+        var creditosGO = new GameObject("Creditos");
+        var creditos = creditosGO.AddComponent<CreditosUI>();
+        creditos.equipe = EquipeDoProjeto;
+
         var menu = new GameObject("MenuPrincipal");
-        menu.AddComponent<MainMenu>();
+        var mainMenu = menu.AddComponent<MainMenu>();
+        mainMenu.creditos = creditos;
 
         string caminho = $"{PastaCenas}/00_MenuPrincipal.unity";
         EditorSceneManager.SaveScene(cena, caminho);
         Debug.Log("[Kaida] Cena montada: 00_MenuPrincipal (com cenário ao fundo)");
         return caminho;
     }
+
+    /// <summary>
+    /// Integrantes do grupo, como aparecem nos créditos do jogo e no README.
+    /// Um nome por linha.
+    /// </summary>
+    public const string EquipeDoProjeto =
+        "Fabrício Júnio Almeida Dias\n" +
+        "Camila Pereira Raimundo\n" +
+        "Luan Miranda Padilha\n" +
+        "Kauã Limão Nunes";
 
     /// <summary>Cenário curto que fica rodando atrás do menu.</summary>
     static readonly string[] CenarioDoMenu = {

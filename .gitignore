@@ -46,3 +46,6 @@ Thumbs.db
 
 # Cenas temporarias criadas pelo Test Runner
 /[Aa]ssets/InitTestScene*
+
+# Pacote de distribuicao (vai para o Releases, nao para o repo)
+Kaida-Windows.zip

@@ -10,6 +10,9 @@ public class MainMenu : MonoBehaviour
 {
     enum Aba { Principal, Dificuldade, Controles, Video }
 
+    [Tooltip("Tela de creditos, exigida pela entrega.")]
+    public CreditosUI creditos;
+
     GameObject painelPrincipal, painelDificuldade, painelControles, painelVideo;
     Button botaoContinuar;
     Text rotuloDificuldade, descricaoDificuldade, rotuloTela, rotuloVolume;
@@ -164,6 +167,12 @@ public class MainMenu : MonoBehaviour
         UIKit.Botao(voltar, "Voltar", () => Trocar(Aba.Principal));
     }
 
+    void AbrirCreditos()
+    {
+        if (creditos == null) creditos = FindObjectOfType<CreditosUI>();
+        if (creditos != null) creditos.Abrir();
+    }
+
     void AjustarVolume(float passo)
     {
         GameSettings.Volume = Mathf.Clamp01(GameSettings.Volume + passo);
@@ -222,7 +231,8 @@ public class MainMenu : MonoBehaviour
         botaoContinuar = UIKit.Botao(coluna, "Continuar", Continuar);
         UIKit.Botao(coluna, "Dificuldade", () => Trocar(Aba.Dificuldade));
         UIKit.Botao(coluna, "Controles", () => Trocar(Aba.Controles));
-        UIKit.Botao(coluna, "Tela", () => Trocar(Aba.Video));
+        UIKit.Botao(coluna, "Tela e som", () => Trocar(Aba.Video));
+        UIKit.Botao(coluna, "Créditos", AbrirCreditos);
         UIKit.Botao(coluna, "Sair", Sair);
 
         rotuloDificuldade = UIKit.Subtitulo(t, "", new Vector2(ColunaX, -152f), 12);
