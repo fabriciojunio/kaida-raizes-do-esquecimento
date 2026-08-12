@@ -1,23 +1,38 @@
 using UnityEngine;
 
 /// <summary>
-/// Agarrado na parede (habilidade "wall_climb", obtida no fim da Caverna Musgosa).
-/// Kaida desliza devagar para baixo e pode saltar para o lado oposto. É o que
-/// abre os atalhos verticais de volta para a Vila e a Floresta.
+/// Agarrada na parede (habilidade "wall_climb", obtida na Caverna Musgosa).
+/// Kaida desliza devagar e salta para o lado oposto. É o que vence o poço de
+/// saída da Caverna e abre os atalhos verticais de volta.
 /// </summary>
 public class PlayerWallClingState : State
 {
     PlayerController p;
-    int wallSide;   // lado da parede: 1 = parede à direita, -1 = à esquerda
+    int wallSide;      // lado da parede: 1 = parede à direita, -1 = à esquerda
+    float carencia;
+
+    /// <summary>
+    /// Tempo que ela continua "agarrada" depois de perder o contato ou de o
+    /// jogador soltar a direção.
+    ///
+    /// É o coyote time da parede, e é o que separa uma escalada que responde
+    /// de uma que parece travada: sem ele, qualquer folga de um frame entre
+    /// encostar e apertar pulo virava queda até o pé do poço.
+    /// </summary>
+    const float Carencia = 0.12f;
 
     public PlayerWallClingState(PlayerController player) { p = player; }
 
     public override void Enter()
     {
-        wallSide = p.facing;
+        wallSide = p.LadoDaParede();
+        if (wallSide == 0) wallSide = p.facing;
+
+        p.SetFacing(wallSide);     // encara a parede, senão o sprite fica de costas
         p.SetVelocity(0f, 0f);
-        p.RefreshAirAbilities();   // agarrar na parede devolve dash e pulo duplo
+        p.RefreshAirAbilities();   // agarrar devolve o dash e o pulo duplo
         p.PlayAnim("wallcling");
+        carencia = Carencia;
     }
 
     public override void PhysicsUpdate()
@@ -30,21 +45,9 @@ public class PlayerWallClingState : State
     {
         if (p.IsGrounded()) { machine.ChangeState("idle"); return; }
 
-        // soltou a direção ou a parede acabou
-        if (!p.IsTouchingWall() || Mathf.Abs(p.InputX) < 0.01f || Mathf.Sign(p.InputX) != wallSide)
-        {
-            machine.ChangeState("fall");
-            return;
-        }
-
         if (Input.GetButtonDown("Jump"))
         {
-            // salta para o lado oposto da parede e trava o controle por um instante
-            p.SetFacing(-wallSide);
-            p.SetVelocity(-wallSide * p.stats.wallJumpForceX, p.stats.JumpVelocity * p.stats.wallJumpPower);
-            p.wallJumpLockTimer = p.stats.wallJumpLockTime;
-            p.PlayAnim("jump");
-            machine.ChangeState("fall");   // o fall assume a subida com o controle travado
+            Saltar();
             return;
         }
 
@@ -54,10 +57,28 @@ public class PlayerWallClingState : State
             machine.ChangeState("dash");
             return;
         }
+
+        bool naParede = p.LadoDaParede() == wallSide;
+        bool empurrandoParaLonge = Mathf.Abs(p.InputX) > 0.01f && Mathf.Sign(p.InputX) != wallSide;
+
+        if (naParede && !empurrandoParaLonge)
+        {
+            carencia = Carencia;
+            return;
+        }
+
+        carencia -= Time.deltaTime;
+        if (carencia <= 0f) machine.ChangeState("fall");
     }
 
-    public override void Exit()
+    void Saltar()
     {
-        p.wallJumpLockTimer = Mathf.Max(p.wallJumpLockTimer, 0f);
+        // salta para o lado oposto e trava o controle por um instante, senão
+        // segurar a direção da parede colava a Kaida de volta nela
+        p.SetFacing(-wallSide);
+        p.SetVelocity(-wallSide * p.stats.wallJumpForceX, p.stats.JumpVelocity * p.stats.wallJumpPower);
+        p.wallJumpLockTimer = p.stats.wallJumpLockTime;
+        p.PlayAnim("jump");
+        machine.ChangeState("fall");   // o fall assume a subida com o controle travado
     }
 }
