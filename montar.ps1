@@ -56,8 +56,12 @@ $argsEdit = @(
 )
 if ((Executar "Testes EditMode" $argsEdit "testes-editmode.log") -ne 0) { $falhou = $true }
 
+# Sem "-nographics": os testes de PlayMode carregam as cenas de verdade e
+# alguns chamam Camera.Render para guardar captura de tela. Sem contexto
+# grafico o mono derruba o processo no meio da suite, e o resultado parece
+# falha de teste quando e falha de ambiente.
 $argsPlay = @(
-    "-batchmode", "-nographics",
+    "-batchmode",
     "-projectPath", "`"$projeto`"",
     "-runTests", "-testPlatform", "PlayMode",
     "-testResults", "`"$logs\resultado-playmode.xml`"",
