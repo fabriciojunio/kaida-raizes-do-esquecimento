@@ -184,23 +184,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f512a0bc93a4484d9251b82aa9898f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  healthFase1: 12
-  healthFase2: 14
-  healthFase3: 16
+  maxHealth: 20
   beamPrefab: {fileID: 8736481027719437747, guid: f861db359af20ea458b2bba0d2306a59, type: 3}
   beamOrigin: {fileID: 1537617066039014185}
   beamInterval: 2.4
   beamSpeed: 6
   beamsPorSalva: 3
-  ecoPrefabs:
-  - {fileID: 764546454367054960, guid: f3671d789415dd0489b68a259bb93d81, type: 3}
-  - {fileID: 6284102995222294469, guid: 4e4d549f111fec048861ff053b9a6be3, type: 3}
-  - {fileID: 3932018699711819333, guid: 7ad86ea1f8c975c48ae005cf26d1d20c, type: 3}
-  pontosDeInvocacao: []
-  ecosPorOnda: 2
-  intervaloEntreOndas: 8
   velocidadeInvestida: 6
-  intervaloInvestida: 2.4
+  intervaloInvestida: 3.2
   danoContato: 1
   animator: {fileID: 1495632787467614775}
   spriteRenderer: {fileID: 188979561841723676}

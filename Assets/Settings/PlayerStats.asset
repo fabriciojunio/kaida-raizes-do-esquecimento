@@ -26,10 +26,6 @@ MonoBehaviour:
   jumpBufferTime: 0.13
   airJumps: 1
   airJumpPower: 0.92
-  wallSlideSpeed: 3.5
-  wallJumpForceX: 9.5
-  wallJumpPower: 1
-  wallJumpLockTime: 0.16
   dashSpeed: 19
   dashTime: 0.17
   dashCooldown: 0.4

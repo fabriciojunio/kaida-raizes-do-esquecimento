@@ -36,7 +36,6 @@ Transform:
   m_Children:
   - {fileID: 734396995647508664}
   - {fileID: 3000797351729632790}
-  - {fileID: 6416383724503714193}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &891906193685688320
@@ -192,8 +191,6 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
-  wallCheck: {fileID: 6416383724503714193}
-  wallCheckDistance: 0.35
   attackPoint: {fileID: 3000797351729632790}
   attackRadius: 1.35
   enemyLayer:
@@ -213,38 +210,6 @@ MonoBehaviour:
   jumpBufferTimer: 0
   dashCooldownTimer: 0
   pendingAirJump: 0
-  wallJumpLockTimer: 0
---- !u!1 &5712504543949573662
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 6416383724503714193}
-  m_Layer: 0
-  m_Name: WallCheck
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &6416383724503714193
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5712504543949573662}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.5, y: 1.6, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 7504321131032183113}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7050148889584891844
 GameObject:
   m_ObjectHideFlags: 0

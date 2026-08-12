@@ -91,8 +91,8 @@ O jogo assume a resolução nativa do monitor e funciona de 4:3 a ultrawide
 ### 5.1 Protagonista
 
 **Kaida** - espadachim sem memória. Move-se com agilidade: corre, dá dash,
-pula com altura variável e, conforme avança, ganha pulo duplo e escalada de
-parede. Começa com 5 pontos de vida no modo Normal.
+pula com altura variável e, conforme avança, ganha o pulo duplo. Começa com
+5 pontos de vida no modo Normal.
 
 ### 5.2 Inimigos
 
@@ -100,21 +100,28 @@ parede. Começa com 5 pontos de vida no modo Normal.
 |---|---|---|---|
 | **Javali-Casca** | Recua, bufa e dispara numa investida reta. Levar dano durante a corrida interrompe o ataque | 3 | Ler o aviso, desviar, atacar na abertura |
 | **Abelha-Eco** | Voa em onda senoidal e mergulha em diagonal. Depois do mergulho, paira ao alcance | 2 | Olhar para cima, não só para os lados |
-| **Caracol-Rastejante** | Ao apanhar, se fecha na casca e fica imune por 1,6 s | 4 | Esperar o tempo certo em vez de socar o botão |
+| **Caracol-Rastejante** | A cada dois golpes se fecha na casca e fica imune por 1,1 s | 3 | Esperar o tempo certo em vez de socar o botão |
 
 ### 5.3 Chefe
 
 **O Guardião do Lúmen** - criatura flutuante corrompida pelo mineral que
-deveria proteger. Três fases, cada uma cobrando uma habilidade diferente:
+deveria proteger. Um confronto só, com **20 pontos de vida numa barra
+única**. Ele alterna dois padrões:
 
-| Fase | Comportamento | Vida | Habilidade cobrada |
-|---|---|---|---|
-| 1 | Salvas de feixes em leque, descendo até a altura da jogadora | 12 | Dash (atravessar na invulnerabilidade) |
-| 2 | Invoca ecos enfraquecidos dos inimigos já vencidos | 14 | O combate aprendido até ali |
-| 3 | Investidas corpo a corpo rápidas, com feixes cortando a fuga | 16 | Pulo duplo e parede, para não ser encurralada |
+| Padrão | Comportamento | O que cobra |
+|---|---|---|
+| Feixes | Salvas em leque na direção da jogadora, a cada 2,4 s | Dash, para atravessar na janela de invulnerabilidade |
+| Investida | Avança em linha reta até a posição onde a Kaida estava | Leitura do aviso e reposicionamento |
 
-Entre as fases há uma transição em que ele fica intocável e o campo é
-limpo - um respiro de leitura, que separa "difícil" de "injusto".
+Entre um e outro ele acompanha a altura de quem está jogando, para que a
+espada sempre tenha como alcançá-lo. Durante a abertura é intocável, e cada
+golpe recebido o faz piscar.
+
+O confronto já foi dividido em três fases, com invocação de inimigos entre
+elas. Na prática virava matar horda enquanto o chefe assistia de longe, e o
+jogador chegava ao fim sem sentir que tinha enfrentado alguém. A arena tem
+**três inimigos comuns, um de cada tipo, colocados no mapa** - não são
+invocados nem repostos.
 
 ## 6. Cenários
 
@@ -127,7 +134,7 @@ identidade a cada área.
 | **Orla da Vila** | Neutra, casas, árvores verdes | Tutorial: ensina andar, pular, atacar e dash num espaço seguro |
 | **Floresta Silente** | Verde dessaturado, mata densa | Primeira área real. Ao fim, o **Pulo Duplo** |
 | **Lago Silente** | Claro, árvores douradas, água | Travessia por cima da água. Cair devolve o caminho andado |
-| **Caverna Musgosa** | Azul-acinzentado, sem árvores | Verticalidade. Ao fim, a **Escalada de Parede** |
+| **Caverna Musgosa** | Azul-acinzentado, sem árvores | Verticalidade: escadas de plataformas dos dois lados |
 | **Santuário Esquecido** | Violeta, árvores vermelhas | Arena do confronto final |
 
 O fundo de cada região tem quatro camadas de mata com parallax próprio,
@@ -156,21 +163,15 @@ através dele. O desfecho fica em aberto de propósito.
 | Habilidade | Onde é obtida | O que libera |
 |---|---|---|
 | Movimento, ataque e dash | Início | Base do jogo |
-| **Pulo Duplo** | Alto da Floresta Silente | Plataformas e coletáveis fora da rota; encurta a travessia do lago |
-| **Escalada de Parede** | Alto da Caverna Musgosa | O poço de saída da Caverna, que é obrigatório |
+| **Pulo Duplo** | Alto da Floresta Silente | Plataformas e coletáveis fora da rota principal |
 
-As habilidades ficam gravadas no save e coletáveis já pegos não reaparecem
-ao revisitar uma sala.
+A habilidade fica gravada no save e coletáveis já pegos não reaparecem ao
+revisitar uma sala.
 
-A Caverna Musgosa termina num poço vertical de treze unidades, fechado por
-duas paredes de frente uma para a outra. Não há rota pelo chão: a saída da
-região fica no alto, e só se chega lá saltando de parede em parede. É o
-trecho que cobra a habilidade da própria região, e o motivo de a escalada
-ficar antes do poço no traçado do mapa.
-
-O Pulo Duplo é opcional por decisão de projeto: ele abre atalhos e alcança
-os nódulos de vida escondidos, mas nenhum caminho obrigatório depende dele.
-Quem joga sem perceber que pegou a habilidade ainda termina o jogo.
+O Pulo Duplo é opcional por decisão de projeto: abre atalhos e alcança os
+nódulos de vida escondidos, mas nenhum caminho obrigatório depende dele.
+Todas as cinco regiões são atravessáveis com o movimento básico, e é um
+teste automatizado que garante isso a cada alteração de mapa.
 
 ## 9. Itens e recompensas
 
@@ -182,7 +183,7 @@ Quem joga sem perceber que pegou a habilidade ainda termina o jogo.
 
 ## 10. Vitória e derrota
 
-**Vitória:** derrotar as três fases do Guardião no Santuário Esquecido. A
+**Vitória:** derrotar o Guardião no Santuário Esquecido. A
 tela final mostra o balanço da jornada - fragmentos encontrados, nódulos
 reunidos e habilidades despertadas - e oferece jogar de novo ou voltar ao
 menu.
@@ -299,12 +300,11 @@ fica desativado enquanto não existe um save.
 
 ## 14. Regras
 
-1. Pulo duplo e escalada de parede só funcionam depois de encontradas no
-   mapa.
+1. O pulo duplo só funciona depois de encontrado no mapa.
 2. Coletáveis já pegos não reaparecem ao revisitar uma sala.
 3. Cair na água do lago custa vida e devolve ao último marco.
 4. Dentro da casca, o caracol não recebe dano.
-5. Durante a abertura e as transições de fase, o Guardião é intocável.
-6. Enquanto houver ecos em campo na fase 2, o chefe se mantém afastado.
+5. Durante a abertura, o Guardião é intocável.
+6. O Guardião não invoca inimigos: quem está na arena está no mapa.
 7. Morrer devolve ao último marco tocado, sem perder habilidades ou itens.
 8. Não há limite de tentativas.

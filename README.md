@@ -62,9 +62,7 @@ O jogo assume a resolução do monitor onde for aberto, de 4:3 a ultrawide.
 | Dash | Shift esquerdo |
 | Pausar | Esc |
 
-Pulo duplo e escalada de parede só funcionam depois de encontrar a
-habilidade correspondente no mapa - é um metroidvania. A saída da Caverna
-Musgosa é um poço vertical: sem a escalada de parede não dá para passar.
+O pulo duplo só funciona depois de encontrar a habilidade no mapa.
 
 ## O jogo
 
@@ -72,13 +70,13 @@ Cinco regiões conectadas, percorridas nos dois sentidos:
 
 ```
 Orla da Vila → Floresta Silente → Lago Silente → Caverna Musgosa → Santuário
- (tutorial)      (pulo duplo)      (travessia)    (escalada parede)   (chefe)
+ (tutorial)      (pulo duplo)      (travessia)     (verticalidade)     (chefe)
 ```
 
 - **3 tipos de inimigo**, cada um com padrão próprio: o javali telegrafa e
   investe, a abelha mergulha em diagonal, o caracol se fecha na casca e
-  fica imune por um tempo
-- **Chefe final em três fases**, cada uma cobrando uma habilidade diferente
+  fica imune por um instante
+- **Chefe final** com barra de vida única, alternando feixes e investidas
 - **Três dificuldades**, escolhidas ao começar a partida, que mudam vida,
   invulnerabilidade e o comportamento dos inimigos
 - **Colecionáveis**: fragmentos de lore e nódulos que aumentam a vida máxima

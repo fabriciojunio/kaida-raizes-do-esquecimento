@@ -30,7 +30,7 @@ em `PlayerStats`.
 
 Inimigo base com patrulha, detecção por linha de visão e dano por contato.
 Três comportamentos derivados (javali, abelha, caracol) e o Guardião do
-Lúmen com três fases numa máquina de estados própria.
+Lúmen, com máquina de estados própria e barra de vida única.
 
 **Responsável:** _______________________
 
@@ -114,3 +114,7 @@ Vale mencionar os problemas enfrentados, porque mostram processo:
   unidade ao atacar.
 - O chefe, como corpo dinâmico, pousava numa plataforma da arena e ficava
   alto demais para o ataque corpo a corpo. Virou corpo cinemático.
+- Virar a personagem de lado só troca o flipX do sprite: os marcadores
+  presos a ela continuavam à direita, então virada para a esquerda o golpe
+  saía pelas costas. Nenhum teste pegou porque todos punham o inimigo à
+  direita.
