@@ -2,8 +2,8 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// Barra de vida do Guardião, com o número da fase. Aparece só durante o
-/// confronto e some quando ele cai.
+/// Barra de vida do Guardião. Aparece durante o confronto e some quando
+/// ele cai. Uma barra só: o combate não tem fases.
 /// </summary>
 public class BossHealthUI : MonoBehaviour
 {
@@ -20,17 +20,15 @@ public class BossHealthUI : MonoBehaviour
         if (boss == null) { grupo.alpha = 0f; return; }
 
         boss.HealthChanged += AoMudarVida;
-        boss.FaseMudou += AoMudarFase;
         boss.Morreu += AoMorrer;
-        AoMudarVida(boss.Health, boss.MaxHealthFaseAtual);
-        AoMudarFase(boss.FaseAtual);
+        AoMudarVida(boss.Health, boss.maxHealth);
+        if (rotulo != null) rotulo.text = "O Guardião do Lúmen";
     }
 
     void OnDestroy()
     {
         if (boss == null) return;
         boss.HealthChanged -= AoMudarVida;
-        boss.FaseMudou -= AoMudarFase;
         boss.Morreu -= AoMorrer;
     }
 
@@ -38,11 +36,6 @@ public class BossHealthUI : MonoBehaviour
     {
         if (preenchimento == null) return;
         preenchimento.fillAmount = max > 0 ? (float)atual / max : 0f;
-    }
-
-    void AoMudarFase(int fase)
-    {
-        if (rotulo != null) rotulo.text = $"O Guardião do Lúmen  -  fase {fase} de 3";
     }
 
     void AoMorrer()

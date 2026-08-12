@@ -1,36 +1,31 @@
 using UnityEngine;
 
 /// <summary>
-/// O Guardião do Lúmen (Santuário Esquecido). Três fases, cada uma cobrando
-/// uma habilidade diferente que Kaida juntou pelo caminho:
-///   1. feixes de memória à distância  -> dash
-///   2. ecos dos inimigos já vencidos  -> combate aprendido
-///   3. corpo a corpo encurralando     -> pulo duplo e parede
+/// O Guardião do Lúmen, no Santuário Esquecido. Um confronto só, direto: ele
+/// tem uma barra de vida e cai quando ela zera.
+///
+/// Já foi dividido em três fases, com invocação de inimigos entre elas. Na
+/// prática o combate virava matar horda enquanto o chefe ficava de fora da
+/// própria luta - e o jogador chegava ao fim sem sentir que tinha enfrentado
+/// alguém. Agora é ele e a Kaida.
+///
 /// Reaproveita a mesma State/StateMachine do jogador.
 /// </summary>
 public class GuardianBoss : MonoBehaviour, IDamageable
 {
     [Header("Vida")]
-    public int healthFase1 = 12;
-    public int healthFase2 = 14;
-    public int healthFase3 = 16;
+    public int maxHealth = 20;
 
-    [Header("Fase 1 - feixes")]
+    [Header("Feixes de lúmen")]
     public GameObject beamPrefab;
     public Transform beamOrigin;
-    public float beamInterval = 1.5f;
-    public float beamSpeed = 7f;
+    public float beamInterval = 2.4f;
+    public float beamSpeed = 6f;
     public int beamsPorSalva = 3;
 
-    [Header("Fase 2 - ecos")]
-    public GameObject[] ecoPrefabs;
-    public Transform[] pontosDeInvocacao;
-    public int ecosPorOnda = 3;
-    public float intervaloEntreOndas = 6f;
-
-    [Header("Fase 3 - corpo a corpo")]
-    public float velocidadeInvestida = 7.5f;
-    public float intervaloInvestida = 1.6f;
+    [Header("Investida")]
+    public float velocidadeInvestida = 6f;
+    public float intervaloInvestida = 3.2f;
     public int danoContato = 1;
 
     [Header("Referências")]
@@ -40,32 +35,25 @@ public class GuardianBoss : MonoBehaviour, IDamageable
     public LayerMask playerLayer;
 
     public StateMachine Machine { get; private set; }
-    public int FaseAtual { get; private set; } = 1;
     public int Health { get; private set; }
     public bool Derrotado { get; private set; }
 
-    public System.Action<int, int> HealthChanged;   // (atual, max da fase)
-    public System.Action<int> FaseMudou;
+    public System.Action<int, int> HealthChanged;
     public System.Action Morreu;
 
     Rigidbody2D rb;
 
     public Rigidbody2D Body => rb;
-    public int MaxHealthFaseAtual =>
-        FaseAtual == 1 ? healthFase1 : FaseAtual == 2 ? healthFase2 : healthFase3;
 
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         if (rb != null) { rb.gravityScale = 0f; rb.freezeRotation = true; }
-        Health = healthFase1;
+        Health = maxHealth;
 
         Machine = new StateMachine();
         Machine.Add("intro", new BossIntroState(this));
-        Machine.Add("fase1", new BossPhase1State(this));
-        Machine.Add("fase2", new BossPhase2State(this));
-        Machine.Add("fase3", new BossPhase3State(this));
-        Machine.Add("transicao", new BossTransitionState(this));
+        Machine.Add("combate", new BossCombateState(this));
         Machine.Add("morto", new BossDeadState(this));
     }
 
@@ -77,7 +65,7 @@ public class GuardianBoss : MonoBehaviour, IDamageable
             if (p != null) player = p.transform;
         }
         Machine.SetInitial("intro");
-        HealthChanged?.Invoke(Health, MaxHealthFaseAtual);
+        HealthChanged?.Invoke(Health, maxHealth);
     }
 
     void Update()   { if (!Derrotado) Machine.LogicUpdate(); }
@@ -86,28 +74,13 @@ public class GuardianBoss : MonoBehaviour, IDamageable
     public void TakeDamage(int amount, Vector2 sourcePos)
     {
         if (Derrotado) return;
-        // durante a transição entre fases ele fica intocável
-        if (Machine.CurrentName == "transicao" || Machine.CurrentName == "intro") return;
+        if (Machine.CurrentName == "intro") return;   // durante a abertura, intocável
 
         Health = Mathf.Max(0, Health - amount);
-        HealthChanged?.Invoke(Health, MaxHealthFaseAtual);
+        HealthChanged?.Invoke(Health, maxHealth);
         StartCoroutine(FlashRoutine());
 
-        if (Health <= 0)
-        {
-            if (FaseAtual < 3) Machine.ChangeState("transicao");
-            else Machine.ChangeState("morto");
-        }
-    }
-
-    /// <summary>Chamado pelo estado de transição ao terminar a virada de fase.</summary>
-    public void AvancarFase()
-    {
-        FaseAtual++;
-        Health = MaxHealthFaseAtual;
-        HealthChanged?.Invoke(Health, MaxHealthFaseAtual);
-        FaseMudou?.Invoke(FaseAtual);
-        Machine.ChangeState("fase" + FaseAtual);
+        if (Health <= 0) Machine.ChangeState("morto");
     }
 
     public void MarcarDerrotado()
@@ -134,39 +107,6 @@ public class GuardianBoss : MonoBehaviour, IDamageable
             brb.velocity = direcao.normalized * beamSpeed;
     }
 
-    /// <summary>
-    /// Invoca ecos fracos dos inimigos que o jogador já enfrentou. Quem chamou
-    /// pode passar uma lista para receber os ecos criados e acompanhar só
-    /// esta onda, em vez de contar todos os inimigos da cena.
-    /// </summary>
-    public int InvocarEcos(int quantidade, System.Collections.Generic.List<EnemyController> registro = null)
-    {
-        if (ecoPrefabs == null || ecoPrefabs.Length == 0) return 0;
-        if (pontosDeInvocacao == null || pontosDeInvocacao.Length == 0) return 0;
-
-        int criados = 0;
-        for (int i = 0; i < quantidade; i++)
-        {
-            var prefab = ecoPrefabs[Random.Range(0, ecoPrefabs.Length)];
-            var ponto = pontosDeInvocacao[i % pontosDeInvocacao.Length];
-            if (prefab == null || ponto == null) continue;
-
-            var eco = Instantiate(prefab, ponto.position, Quaternion.identity);
-            // "eco": versão enfraquecida do inimigo original
-            var ec = eco.GetComponent<EnemyController>();
-            if (ec != null)
-            {
-                ec.maxHealth = Mathf.Max(1, ec.maxHealth / 2);
-                ec.moveSpeed *= 1.15f;
-                registro?.Add(ec);
-            }
-            var sr = eco.GetComponentInChildren<SpriteRenderer>();
-            if (sr != null) sr.color = new Color(0.75f, 0.85f, 1f, 0.8f);
-            criados++;
-        }
-        return criados;
-    }
-
     public void AtingirJogadorSeEncostou(float raio)
     {
         var hit = Physics2D.OverlapCircle(transform.position, raio, playerLayer);
@@ -175,12 +115,21 @@ public class GuardianBoss : MonoBehaviour, IDamageable
         if (pc != null) pc.TakeDamage(danoContato, transform.position);
     }
 
+    /// <summary>
+    /// Pisca ao levar golpe. Longo o bastante para aparecer: com 0,08 s o
+    /// jogador não via diferença nenhuma e achava que o golpe não tinha entrado.
+    /// </summary>
     System.Collections.IEnumerator FlashRoutine()
     {
         if (spriteRenderer == null) yield break;
-        var c = spriteRenderer.color;
-        spriteRenderer.color = new Color(1f, 0.8f, 0.8f);
-        yield return new WaitForSeconds(0.08f);
-        if (spriteRenderer != null) spriteRenderer.color = c;
+        var original = spriteRenderer.color;
+        for (int i = 0; i < 2; i++)
+        {
+            spriteRenderer.color = new Color(1f, 0.55f, 0.55f);
+            yield return new WaitForSeconds(0.07f);
+            if (spriteRenderer == null) yield break;
+            spriteRenderer.color = original;
+            yield return new WaitForSeconds(0.05f);
+        }
     }
 }

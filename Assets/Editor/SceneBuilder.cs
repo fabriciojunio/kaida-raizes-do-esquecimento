@@ -101,40 +101,37 @@ public static class SceneBuilder
         "################################################################",
     };
 
-    // Caverna Musgosa: a região da escalada de parede.
-    //
-    // A saída fica no alto de um poço fechado nas colunas 55-56 e 60-63, com
-    // três unidades de vão e um descanso na metade da subida. Andar
-    // reto até a passagem não funciona mais: quem chega ao pé do poço só sobe
-    // saltando de uma parede para a outra, e para isso precisa ter pegado o
-    // 'H' lá atrás. Antes as cinco regiões eram atravessáveis pelo chão do
-    // começo ao fim, e as duas habilidades nunca chegavam a ser cobradas.
+    // Caverna Musgosa: a descida mais fechada do vale, com escadas de
+    // plataformas dos dois lados e a passagem para o Santuário no fim do chão.
     static readonly string[] CavernaMusgosa = {
         "................................................................",
         "................................................................",
         "................................................................",
-        "..............................................................>.",
-        "...........................H...........................##...####",
-        "........................=======........................##...####",
-        ".......................................................##...####",
-        ".......................N...............................##...####",
-        "....................=======...........=======..........##...####",
-        ".......................................................##...####",
-        ".....................................A.................##==.####",
-        "................=======...........=======..............##...####",
-        ".......................................................##...####",
-        ".................................S.....................##...####",
-        "............=======...........=======...........=======.....####",
-        "............................................................####",
-        ".<............p...C.....................S.....A....C........####",
+        "................................................................",
+        "...........................N....................................",
+        "........................=======.................................",
+        "................................................................",
+        ".......................F........................................",
+        "....................=======...........=======...................",
+        "................................................................",
+        ".....................................A..........................",
+        "................=======...........=======.......................",
+        "................................................................",
+        ".................................S..............................",
+        "............=======...........=======...........=======.........",
+        "................................................................",
+        ".<............p...C.....................S.....A....C.........>..",
         "################################################################",
         "################################################################",
         "################################################################",
     };
 
-    // Arena do chefe. As plataformas são escadas dos dois lados: o Guardião
-    // flutua na altura da plataforma do meio, então dá para alcançá-lo nas
-    // fases 1 e 2 sem precisar do pulo duplo - que ainda assim ajuda muito.
+    // Arena do chefe. As plataformas são escadas dos dois lados, e o Guardião
+    // desce até a altura de quem está jogando, então a espada sempre alcança.
+    //
+    // Três inimigos comuns, um de cada tipo, espalhados pela arena. Não são
+    // invocados nem repostos: quem matar, matou. Eles dão o que fazer no
+    // caminho até o chefe sem transformar o confronto em matar horda.
     static readonly string[] SantuarioEsquecido = {
         "................................................................",
         "................................................................",
@@ -146,13 +143,13 @@ public static class SceneBuilder
         "................................G...............................",
         "............................=========...........................",
         "................................................................",
-        "................................................................",
+        "............................................A...................",
         "....................=======...........=======...................",
         "................................................................",
-        "................................................................",
+        "......................S.........................................",
         "..........=======...............................=======.........",
         "................................................................",
-        ".<............p...............C.................................",
+        ".<............p...............C...............B.................",
         "################################################################",
         "################################################################",
         "################################################################",
@@ -177,13 +174,6 @@ public static class SceneBuilder
         /// <summary>Quedas d'água caindo no lago.</summary>
         public bool temCachoeiras;
 
-        /// <summary>
-        /// Poço vertical que só se vence saltando de parede em parede. Fica
-        /// declarado aqui, e não deduzido do mapa, porque é uma decisão de
-        /// level design: é o trecho que cobra a habilidade.
-        /// Rect vazio = a região não tem poço.
-        /// </summary>
-        public Rect pocoDeEscalada;
     }
 
     [MenuItem("Kaida/5. Gerar cenas")]
@@ -226,9 +216,7 @@ public static class SceneBuilder
                 proxima = "05_SantuarioEsquecido", anterior = "03_LagoSilente",
                 fundo = "Assets/Art/Environment/Cavern/CavernBg1.png",
                 arvore = "",                                 // não crescem árvores lá embaixo
-                densidadeDeArvores = 0, temCasas = false, temVegetacaoDeChao = true,
-                // paredes nas colunas 55-56 e 60-63; o topo inclui a passagem, em y=17,5
-                pocoDeEscalada = new Rect(54.5f, 2.5f, 10f, 15.5f)
+                densidadeDeArvores = 0, temCasas = false, temVegetacaoDeChao = true
             },
             new Regiao {
                 arquivo = "05_SantuarioEsquecido", mapa = SantuarioEsquecido,
@@ -1043,15 +1031,6 @@ public static class SceneBuilder
     static void PovoarMapa(Regiao r, int largura, int altura, GameObject jogador)
     {
         var conteudo = new GameObject("Conteudo");
-        var pontosDeEco = new List<Transform>();
-
-        if (r.pocoDeEscalada.width > 0f)
-        {
-            var poco = new GameObject("PocoDeEscalada");
-            poco.transform.SetParent(conteudo.transform);
-            poco.transform.position = r.pocoDeEscalada.center;
-            poco.AddComponent<PocoDeEscalada>().area = r.pocoDeEscalada;
-        }
 
         for (int linha = 0; linha < altura; linha++)
         {
@@ -1078,7 +1057,7 @@ public static class SceneBuilder
                     case '>': CriarTransicao(conteudo, pos, r.proxima, "voltando"); break;
                     case '<': CriarTransicao(conteudo, pos, r.anterior, "chegando"); break;
 
-                    case 'G': CriarChefe(conteudo, pos, jogador, pontosDeEco, largura, altura); break;
+                    case 'G': CriarChefe(conteudo, pos, jogador); break;
                 }
             }
         }
@@ -1117,18 +1096,10 @@ public static class SceneBuilder
     {
         var go = Instanciar("Assets/Prefabs/PickupHabilidade.prefab", pai, pos);
         if (go == null) return;
-        var p = go.GetComponent<PickupAbility>();
 
-        if (r.arquivo.StartsWith("02_"))
-        {
-            p.abilityId = "double_jump";
-            p.mensagem = "Pulo Duplo\nO ar segura você por um instante a mais.";
-        }
-        else
-        {
-            p.abilityId = "wall_climb";
-            p.mensagem = "Escalada de Parede\nA pedra lembra de quem se apoiou nela.";
-        }
+        var p = go.GetComponent<PickupAbility>();
+        p.abilityId = "double_jump";
+        p.mensagem = "Pulo Duplo\nO ar segura você por um instante a mais.";
     }
 
     static int contadorFragmento = 0;
@@ -1195,32 +1166,13 @@ public static class SceneBuilder
         t.targetSpawnId = spawnDestino;
     }
 
-    static void CriarChefe(GameObject pai, Vector2 pos, GameObject jogador,
-                           List<Transform> pontos, int largura, int altura)
+    static void CriarChefe(GameObject pai, Vector2 pos, GameObject jogador)
     {
         var go = Instanciar("Assets/Prefabs/GuardiaoDoLumen.prefab", pai, pos);
         if (go == null) return;
 
         var boss = go.GetComponent<GuardianBoss>();
         if (jogador != null) boss.player = jogador.transform;
-
-        // quatro cantos da arena para os ecos aparecerem longe do jogador
-        var lista = new List<Transform>();
-        Vector2[] cantos =
-        {
-            new Vector2(pos.x - 12f, pos.y - 5f),
-            new Vector2(pos.x + 12f, pos.y - 5f),
-            new Vector2(pos.x - 7f,  pos.y + 2f),
-            new Vector2(pos.x + 7f,  pos.y + 2f),
-        };
-        for (int i = 0; i < cantos.Length; i++)
-        {
-            var p = new GameObject($"PontoDeEco_{i}");
-            p.transform.SetParent(pai.transform);
-            p.transform.position = cantos[i];
-            lista.Add(p.transform);
-        }
-        boss.pontosDeInvocacao = lista.ToArray();
     }
 
     static Vector2 AcharCaractere(string[] mapa, char alvo, int largura, int altura)

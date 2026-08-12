@@ -28,6 +28,6 @@ public class BossIntroState : State
     public override void LogicUpdate()
     {
         timer -= Time.deltaTime;
-        if (timer <= 0f) machine.ChangeState("fase1");
+        if (timer <= 0f) machine.ChangeState("combate");
     }
 }

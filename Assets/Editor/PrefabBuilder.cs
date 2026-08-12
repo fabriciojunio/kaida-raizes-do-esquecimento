@@ -74,10 +74,6 @@ public static class PrefabBuilder
 
         stats.airJumps = 1;
         stats.airJumpPower = 0.92f;
-        stats.wallSlideSpeed = 3.5f;
-        stats.wallJumpForceX = 9.5f;
-        stats.wallJumpPower = 1f;
-        stats.wallJumpLockTime = 0.16f;
 
         stats.dashSpeed = 19f;
         stats.dashTime = 0.17f;
@@ -126,7 +122,6 @@ public static class PrefabBuilder
 
         var groundCheck = Filho(go, "GroundCheck", new Vector3(0f, 0.06f, 0f));
         var attackPoint = Filho(go, "AttackPoint", new Vector3(1.5f, 1.4f, 0f));
-        var wallCheck   = Filho(go, "WallCheck",   new Vector3(0.5f, 1.6f, 0f));
 
         var pc = go.AddComponent<PlayerController>();
         pc.stats = stats;
@@ -140,8 +135,6 @@ public static class PrefabBuilder
         // quem estivesse praticamente colado na personagem.
         pc.attackRadius = 1.35f;
         pc.enemyLayer = MaskEnemy;
-        pc.wallCheck = wallCheck.transform;
-        pc.wallCheckDistance = 0.35f;
         pc.animator = anim;
         pc.spriteRenderer = sr;
 
@@ -318,9 +311,10 @@ public static class PrefabBuilder
         var origem = Filho(go, "BeamOrigin", new Vector3(0f, 1.2f, 0f));
 
         var boss = go.AddComponent<GuardianBoss>();
-        boss.healthFase1 = 12;
-        boss.healthFase2 = 14;
-        boss.healthFase3 = 16;
+        // Uma barra só. As três fases somavam 42 golpes: a barra quase não
+        // andava e parecia que o golpe não entrava. Com 20 cada acerto move
+        // a barra 5%, que é o suficiente para o jogador ver que está indo.
+        boss.maxHealth = 20;
         boss.beamPrefab = AssetDatabase.LoadAssetAtPath<GameObject>($"{PastaPrefabs}/LumenBeam.prefab");
         boss.beamOrigin = origem.transform;
         // Ritmo com folga para ler e revidar. Os valores anteriores não davam
@@ -328,20 +322,12 @@ public static class PrefabBuilder
         boss.beamInterval = 2.4f;
         boss.beamSpeed = 6f;
         boss.beamsPorSalva = 3;
-        boss.ecosPorOnda = 2;
-        boss.intervaloEntreOndas = 8f;
         boss.velocidadeInvestida = 6f;
-        boss.intervaloInvestida = 2.4f;
+        boss.intervaloInvestida = 3.2f;
         boss.danoContato = 1;
         boss.animator = anim;
         boss.spriteRenderer = sr;
         boss.playerLayer = MaskPlayer;
-        boss.ecoPrefabs = new[]
-        {
-            AssetDatabase.LoadAssetAtPath<GameObject>($"{PastaPrefabs}/Inimigo_JavaliCasca.prefab"),
-            AssetDatabase.LoadAssetAtPath<GameObject>($"{PastaPrefabs}/Inimigo_AbelhaEco.prefab"),
-            AssetDatabase.LoadAssetAtPath<GameObject>($"{PastaPrefabs}/Inimigo_CaracolRastejante.prefab"),
-        };
 
         Salvar(go, $"{PastaPrefabs}/GuardiaoDoLumen.prefab");
     }
