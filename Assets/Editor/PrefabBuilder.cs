@@ -264,14 +264,18 @@ public static class PrefabBuilder
                              new Vector2(1.5f, 1.2f), new Vector2(0f, 0.65f));
 
         var e = go.AddComponent<SnailEnemy>();
-        e.maxHealth = 4;
+        // 4 de vida fechando a casca a cada golpe dava 4 esperas de 1,6 s para
+        // matar um caracol - virava um inimigo que o jogador desiste de
+        // enfrentar em vez de um que ele aprende a ler. Dois golpes seguidos
+        // antes de se fechar mantêm a ideia e cabem numa investida só.
+        e.maxHealth = 3;
         e.contactDamage = 1;
         e.moveSpeed = 1.1f;
         e.detectRange = 3.5f;
         e.attackRange = 1f;
         e.attackCooldown = 1.4f;
-        e.hideDuration = 1.6f;
-        e.hitsBeforeHiding = 1;
+        e.hideDuration = 1.1f;
+        e.hitsBeforeHiding = 2;
         ConfigurarInimigo(e, go, 0.12f);
 
         Salvar(go, $"{PastaPrefabs}/Inimigo_CaracolRastejante.prefab");
