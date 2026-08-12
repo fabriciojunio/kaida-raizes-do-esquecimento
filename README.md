@@ -95,11 +95,11 @@ fica versionado como texto em vez de binário.
 
 ## Testes
 
-122 casos, todos passando.
+138 casos, todos passando.
 
 ```
-EditMode   61/61
-PlayMode   61/61
+EditMode   75/75
+PlayMode   63/63
 ```
 
 **EditMode** — lógica sem cena, e verificação de que o projeto gerado bate
@@ -111,12 +111,19 @@ falta um estado, a animação só não toca.
 do pulo, o alcance do dash, o knockback, o respawn, o inimigo que não anda
 para fora da plataforma, as três fases do chefe, a dificuldade e a pausa.
 
-Dois testes existem por causa de bugs que apareceram durante o
-desenvolvimento e que valia a pena travar para sempre: um confere que o
-Guardião está mesmo ao alcance de pulo (senão as fases 1 e 2 viram um
-impasse, já que o ataque é corpo a corpo), e outro confere que pegar um
-Nódulo de Vida não escreve no asset `PlayerStats` em disco — isso vazava a
-vida ganha de uma partida para a seguinte.
+Boa parte dos testes nasceu de defeito encontrado jogando, e ficou para
+não deixar voltar:
+
+- **alcance dos mapas**: um validador percorre as superfícies a partir do
+  ponto de partida e reprova a região se alguma plataforma, item ou
+  passagem ficar ilhado. Ele reprovou as cinco regiões da primeira versão
+- **chão com colisão**: carrega cada região, solta a Kaida e mede se ela
+  cai. Chão sem colisão não aparece em captura nenhuma — o cenário fica
+  perfeito e o jogador atravessa o mundo
+- **confronto com o chefe**: na cena real, não com um chefe montado à mão.
+  O simplificado passava enquanto o do jogo era intocável
+- **pivô das animações**: confere que os pés ficam alinhados entre idle,
+  corrida e ataque, senão a personagem sobe meia unidade ao bater
 
 ```powershell
 .\montar.ps1 -SoTestes
