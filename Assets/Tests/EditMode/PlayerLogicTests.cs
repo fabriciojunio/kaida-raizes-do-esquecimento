@@ -130,12 +130,12 @@ public class PlayerLogicTests
         var ss = go.AddComponent<SaveSystem>();
         ss.DeleteSave();
 
-        ss.UnlockAbility("wall_climb");     // UnlockAbility já grava em disco
+        ss.UnlockAbility("double_jump");     // UnlockAbility já grava em disco
         ss.Data = new SaveData();           // esquece tudo em memória
-        Assert.IsFalse(ss.HasAbility("wall_climb"));
+        Assert.IsFalse(ss.HasAbility("double_jump"));
 
         Assert.IsTrue(ss.LoadGame(), "deveria existir um save gravado");
-        Assert.IsTrue(ss.HasAbility("wall_climb"), "a habilidade precisa sobreviver ao ciclo salvar/carregar");
+        Assert.IsTrue(ss.HasAbility("double_jump"), "a habilidade precisa sobreviver ao ciclo salvar/carregar");
 
         ss.DeleteSave();
         Object.DestroyImmediate(go);

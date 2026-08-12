@@ -25,8 +25,6 @@ public static class CenarioDeTeste
         s.jumpCutMultiplier = 0.45f; s.maxFallSpeed = 24f;
         s.coyoteTime = 0.11f; s.jumpBufferTime = 0.13f;
         s.airJumps = 1; s.airJumpPower = 0.92f;
-        s.wallSlideSpeed = 3.5f; s.wallJumpForceX = 9.5f;
-        s.wallJumpPower = 1f; s.wallJumpLockTime = 0.16f;
         s.dashSpeed = 19f; s.dashTime = 0.17f; s.dashCooldown = 0.4f; s.airDashes = 1;
         s.maxHealth = 5; s.attackDamage = 1; s.invulnTime = 1f; s.knockbackForce = 10f;
         return s;
@@ -74,7 +72,6 @@ public static class CenarioDeTeste
 
         var groundCheck = Filho(go, "GroundCheck", new Vector3(0f, 0.06f, 0f));
         var attackPoint = Filho(go, "AttackPoint", new Vector3(1.1f, 1.5f, 0f));
-        var wallCheck = Filho(go, "WallCheck", new Vector3(0.5f, 1.6f, 0f));
 
         var pc = go.AddComponent<PlayerController>();
         pc.stats = stats != null ? stats : StatsPadrao();
@@ -84,8 +81,6 @@ public static class CenarioDeTeste
         pc.attackPoint = attackPoint;
         pc.attackRadius = 0.95f;
         pc.enemyLayer = MaskEnemy;
-        pc.wallCheck = wallCheck;
-        pc.wallCheckDistance = 0.35f;
         pc.spriteRenderer = sr;
 
         go.SetActive(true);   // só agora o Awake roda, com tudo no lugar

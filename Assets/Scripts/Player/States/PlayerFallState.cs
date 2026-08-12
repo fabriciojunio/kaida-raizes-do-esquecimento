@@ -11,8 +11,7 @@ public class PlayerFallState : State
     public override void PhysicsUpdate()
     {
         p.ApplyGravity(Time.fixedDeltaTime);
-        if (p.wallJumpLockTimer <= 0f)
-            p.ApplyHorizontal(Time.fixedDeltaTime, p.InputX, p.stats.airAccel, p.stats.airDecel);
+        p.ApplyHorizontal(Time.fixedDeltaTime, p.InputX, p.stats.airAccel, p.stats.airDecel);
     }
 
     public override void LogicUpdate()
@@ -27,8 +26,6 @@ public class PlayerFallState : State
             machine.ChangeState(Mathf.Abs(p.InputX) > 0.01f ? "run" : "idle");
             return;
         }
-        if (p.CanWallCling()) { machine.ChangeState("wallcling"); return; }
-
         if (jumpPressed)
         {
             // coyote time tem prioridade: ainda conta como pulo "do chão"

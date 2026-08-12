@@ -19,10 +19,7 @@ public class PlayerJumpState : State
     public override void PhysicsUpdate()
     {
         p.ApplyGravity(Time.fixedDeltaTime);
-        // logo após um salto de parede o controle fica travado, senão o jogador
-        // "gruda" de volta na parede segurando a direção
-        if (p.wallJumpLockTimer <= 0f)
-            p.ApplyHorizontal(Time.fixedDeltaTime, p.InputX, p.stats.airAccel, p.stats.airDecel);
+        p.ApplyHorizontal(Time.fixedDeltaTime, p.InputX, p.stats.airAccel, p.stats.airDecel);
     }
 
     public override void LogicUpdate()
@@ -37,7 +34,6 @@ public class PlayerJumpState : State
             Enter();
             return;
         }
-        if (p.CanWallCling() && p.rb.velocity.y <= 0f) { machine.ChangeState("wallcling"); return; }
         if (p.rb.velocity.y <= 0) { machine.ChangeState("fall"); return; }
         if (Input.GetKeyDown(KeyCode.LeftShift) && p.canDash && p.airDashesLeft > 0) { machine.ChangeState("dash"); return; }
         if (Input.GetButtonDown("Fire1")) { machine.ChangeState("attack"); return; }

@@ -36,9 +36,8 @@ public class CombateComOChefeTests
 
         // passa a abertura, quando ele é intocável de propósito
         yield return new WaitForSeconds(BossIntroState.Duracao + 0.5f);
-        Assert.AreEqual("fase1", boss.Machine.CurrentName);
+        Assert.AreEqual("combate", boss.Machine.CurrentName);
 
-        // encosta na criatura, como quem sobe na plataforma para atacar
         kaida.transform.position = boss.transform.position + new Vector3(-1.8f, -0.6f, 0f);
         kaida.SetFacing(1);
         yield return new WaitForFixedUpdate();
@@ -49,11 +48,10 @@ public class CombateComOChefeTests
 
         var area = new Vector2(kaida.attackRadius * 2f, kaida.attackRadius * 2.6f);
         var atingidos = Physics2D.OverlapBoxAll(
-            kaida.attackPoint.position, area, 0f, kaida.enemyLayer);
+            kaida.PontoAFrente(kaida.attackPoint), area, 0f, kaida.enemyLayer);
 
         Assert.Greater(atingidos.Length, 0,
             $"o golpe não alcança o chefe. Kaida em {kaida.transform.position}, " +
-            $"ponto de ataque em {kaida.attackPoint.position}, área {area}, " +
             $"colisor do chefe em {colisorDoChefe.bounds.center} " +
             $"medindo {colisorDoChefe.bounds.size}, " +
             $"máscara de inimigo {kaida.enemyLayer.value}, " +
@@ -68,11 +66,10 @@ public class CombateComOChefeTests
     }
 
     [UnityTest]
-    public IEnumerator OChefe_MorreDepoisDasTresFases()
+    public IEnumerator OChefe_MorreEVenceOJogo()
     {
-        // O teste mais importante do jogo: dá para terminar. Ele percorre o
-        // confronto inteiro batendo no Guardião até as três fases caírem.
-        // Nenhum teste cobria isso, e a fase 2 estava intransponível.
+        // O teste mais importante do jogo: dá para terminar. Bate no Guardião
+        // até a barra zerar, sem tocar em mais nada da arena.
         SceneManager.LoadScene("05_SantuarioEsquecido");
         yield return null;
         yield return null;
@@ -80,29 +77,20 @@ public class CombateComOChefeTests
         var boss = Object.FindObjectOfType<GuardianBoss>();
         var kaida = Object.FindObjectOfType<PlayerController>();
         Assert.IsNotNull(boss);
-        Assert.IsNotNull(kaida);
+
+        bool venceu = false;
+        boss.Morreu += () => venceu = true;
 
         kaida.isInvulnerable = true;   // aqui se mede o dano dado, não o sofrido
-
         yield return new WaitForSeconds(BossIntroState.Duracao + 0.5f);
 
-        var fasesVistas = new System.Collections.Generic.HashSet<int>();
-        float limite = 90f;
-        float gasto = 0f;
-
+        float limite = 60f, gasto = 0f;
         while (!boss.Derrotado && gasto < limite)
         {
-            fasesVistas.Add(boss.FaseAtual);
-
-            // encosta na criatura e golpeia, que é o que o jogador faz
             kaida.transform.position = boss.transform.position + new Vector3(-1.7f, -0.5f, 0f);
             kaida.SetFacing(1);
             yield return new WaitForFixedUpdate();
             kaida.DoAttackHit();
-
-            // derruba os ecos da fase 2 junto, senão ele não desce
-            foreach (var eco in Object.FindObjectsOfType<EnemyController>())
-                if (eco != null && !eco.Dying) eco.TakeDamage(99, kaida.transform.position);
 
             for (float t = 0f; t < 0.25f; t += Time.fixedDeltaTime)
             {
@@ -113,50 +101,31 @@ public class CombateComOChefeTests
 
         Assert.IsTrue(boss.Derrotado,
             $"o Guardião não caiu em {limite:F0} segundos de combate. " +
-            $"Parou na fase {boss.FaseAtual} com {boss.Health} de vida, " +
-            $"estado {boss.Machine.CurrentName}. Fases alcançadas: " +
-            string.Join(", ", fasesVistas));
+            $"Parou com {boss.Health} de {boss.maxHealth} de vida, " +
+            $"estado {boss.Machine.CurrentName}.");
 
-        CollectionAssert.Contains(fasesVistas, 3, "o confronto nunca chegou à fase 3");
+        yield return null;
+        Assert.IsTrue(venceu, "a morte do chefe não avisou ninguém: não há vitória");
     }
 
     [UnityTest]
-    public IEnumerator Chefe_DesceQuandoAOndaDeEcosEhLimpa()
+    public IEnumerator OChefe_NaoInvocaInimigos()
     {
-        // A fase 2 é a única em que ele se afasta de propósito. Se ele não
-        // voltar depois que os ecos caem, a fase não tem como terminar: o
-        // ataque da Kaida é corpo a corpo e o chefe fica pairando fora de
-        // alcance para sempre.
+        // A arena tem três inimigos comuns, colocados no mapa. O chefe não
+        // repõe nem chama mais: o alvo do confronto é ele, não a horda.
         SceneManager.LoadScene("05_SantuarioEsquecido");
         yield return null;
         yield return null;
 
         var boss = Object.FindObjectOfType<GuardianBoss>();
-        var kaida = Object.FindObjectOfType<PlayerController>();
-        Assert.IsNotNull(boss);
+        int noInicio = Object.FindObjectsOfType<EnemyController>().Length;
 
-        yield return new WaitForSeconds(BossIntroState.Duracao + 0.5f);
-        boss.AvancarFase();
-        Assert.AreEqual("fase2", boss.Machine.CurrentName, "não entrou na fase 2");
+        yield return new WaitForSeconds(BossIntroState.Duracao + 6f);
 
-        // deixa a onda entrar em campo e derruba todos os ecos de uma vez
-        yield return new WaitForSeconds(1.5f);
-        var ecos = Object.FindObjectsOfType<EnemyController>();
-        Assert.Greater(ecos.Length, 0, "a fase 2 não chamou nenhum eco");
-        foreach (var e in ecos) Object.Destroy(e.gameObject);
-        yield return null;
-
-        float melhorDistancia = float.MaxValue;
-        for (float t = 0f; t < 5f; t += Time.fixedDeltaTime)
-        {
-            yield return new WaitForFixedUpdate();
-            melhorDistancia = Mathf.Min(melhorDistancia,
-                Mathf.Abs(boss.transform.position.y - kaida.transform.position.y));
-        }
-
-        Assert.Less(melhorDistancia, 3.5f,
-            $"com a onda limpa o chefe ficou a {melhorDistancia:F1} unidades de " +
-            "altura do jogador: a fase 2 não abre janela de dano.");
+        int agora = Object.FindObjectsOfType<EnemyController>().Length;
+        Assert.LessOrEqual(agora, noInicio,
+            $"a arena tinha {noInicio} inimigos e passou a ter {agora}: " +
+            "o chefe está invocando gente.");
     }
 
     [UnityTest]

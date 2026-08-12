@@ -8,7 +8,7 @@ using UnityEngine;
 [RequireComponent(typeof(Collider2D))]
 public class PickupAbility : MonoBehaviour
 {
-    [Tooltip("Identificador usado pelo SaveSystem: double_jump, wall_climb...")]
+    [Tooltip("Identificador usado pelo SaveSystem. Ex.: double_jump")]
     public string abilityId = "double_jump";
 
     [Tooltip("Texto mostrado ao pegar.")]

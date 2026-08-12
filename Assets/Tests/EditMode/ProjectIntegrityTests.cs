@@ -172,7 +172,6 @@ public class ProjectIntegrityTests
         Assert.IsNotNull(pc.stats, "PlayerStats não foi ligado");
         Assert.IsNotNull(pc.groundCheck, "falta o GroundCheck");
         Assert.IsNotNull(pc.attackPoint, "falta o AttackPoint");
-        Assert.IsNotNull(pc.wallCheck, "falta o WallCheck (escalada de parede)");
         Assert.IsNotNull(pc.animator, "falta o Animator");
         Assert.IsNotNull(pc.spriteRenderer, "falta o SpriteRenderer");
         Assert.IsNotNull(pc.animator.runtimeAnimatorController, "o Animator está sem controller");
@@ -215,12 +214,9 @@ public class ProjectIntegrityTests
 
         var boss = prefab.GetComponent<GuardianBoss>();
         Assert.IsNotNull(boss);
-        Assert.IsNotNull(boss.beamPrefab, "sem beamPrefab a fase 1 não ataca");
+        Assert.IsNotNull(boss.beamPrefab, "sem beamPrefab ele não ataca à distância");
         Assert.IsNotNull(boss.beamOrigin, "falta o ponto de origem do feixe");
-        Assert.IsNotNull(boss.ecoPrefabs, "sem ecoPrefabs a fase 2 fica vazia");
-        Assert.Greater(boss.ecoPrefabs.Length, 0);
-        foreach (var e in boss.ecoPrefabs)
-            Assert.IsNotNull(e, "um dos prefabs de eco ficou nulo");
+        Assert.Greater(boss.maxHealth, 0, "o chefe precisa ter vida para poder morrer");
         Assert.AreNotEqual(0, boss.playerLayer.value);
     }
 
@@ -439,7 +435,6 @@ public class ProjectIntegrityTests
         }
 
         Assert.Contains("double_jump", encontradas, "o Pulo Duplo não está em lugar nenhum do mapa");
-        Assert.Contains("wall_climb", encontradas, "a Escalada de Parede não está em lugar nenhum do mapa");
     }
 
     [TestCase("Assets/Scenes/01_OrlaDaVila.unity")]
@@ -537,8 +532,7 @@ public class ProjectIntegrityTests
 
         Assert.IsNotNull(boss, "o Guardião não está no Santuário");
         Assert.IsNotNull(boss.player, "o chefe não sabe quem perseguir");
-        Assert.IsNotNull(boss.pontosDeInvocacao, "sem pontos de invocação a fase 2 não funciona");
-        Assert.Greater(boss.pontosDeInvocacao.Length, 0);
+        Assert.Greater(boss.maxHealth, 0, "o chefe nasceu sem vida");
     }
 
     // ----------------------------------------------------------- utilidades

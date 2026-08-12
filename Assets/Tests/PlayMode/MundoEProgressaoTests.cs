@@ -67,14 +67,14 @@ public class MundoEProgressaoTests
     [UnityTest]
     public IEnumerator HabilidadeJaPega_NaoReaparece()
     {
-        SaveSystem.Instance.Data.unlockedAbilities.Add("wall_climb");
+        SaveSystem.Instance.Data.unlockedAbilities.Add("double_jump");
 
         var go = new GameObject("Habilidade");
         go.transform.position = new Vector3(20f, 5f, 0f);
         var col = go.AddComponent<CircleCollider2D>();
         col.isTrigger = true;
         var pickup = go.AddComponent<PickupAbility>();
-        pickup.abilityId = "wall_climb";
+        pickup.abilityId = "double_jump";
 
         yield return null;   // deixa o Start rodar
 
@@ -176,12 +176,10 @@ public class MundoEProgressaoTests
 
     // ------------------------------------------------------------------ chefe
     [UnityTest]
-    public IEnumerator Chefe_ComecaNaFase1EFicaIntocavelNaIntro()
+    public IEnumerator Chefe_FicaIntocavelDuranteAAbertura()
     {
         var boss = CriarChefe(new Vector2(20f, 5f));
         yield return null;
-
-        Assert.AreEqual(1, boss.FaseAtual);
 
         int vidaAntes = boss.Health;
         boss.TakeDamage(5, Vector2.zero);      // ainda na abertura
@@ -189,43 +187,23 @@ public class MundoEProgressaoTests
     }
 
     [UnityTest]
-    public IEnumerator Chefe_AvancaDeFaseAoZerarAVida()
+    public IEnumerator Chefe_MorreQuandoAVidaZera()
     {
-        var boss = CriarChefe(new Vector2(20f, 5f));
-        yield return null;
-        yield return new WaitForSeconds(BossIntroState.Duracao + 0.6f);   // passa a intro
-
-        Assert.AreEqual("fase1", boss.Machine.CurrentName);
-
-        boss.TakeDamage(boss.healthFase1, Vector2.zero);
-        yield return null;
-        Assert.AreEqual("transicao", boss.Machine.CurrentName,
-            "zerar a vida da fase 1 leva para a transição, não mata");
-
-        yield return new WaitForSeconds(BossIntroState.Duracao + 0.6f);
-        Assert.AreEqual(2, boss.FaseAtual, "deveria ter virado a fase 2");
-        Assert.AreEqual(boss.healthFase2, boss.Health, "a fase nova começa com a vida dela");
-    }
-
-    [UnityTest]
-    public IEnumerator Chefe_SoMorreDepoisDasTresFases()
-    {
+        // Uma barra só, sem virada de fase: zerou, caiu.
         var boss = CriarChefe(new Vector2(20f, 5f));
         yield return null;
         yield return new WaitForSeconds(BossIntroState.Duracao + 0.6f);
 
-        boss.TakeDamage(boss.healthFase1, Vector2.zero);
-        yield return new WaitForSeconds(BossIntroState.Duracao + 0.6f);
-        Assert.IsFalse(boss.Derrotado, "não pode morrer na fase 1");
+        Assert.AreEqual("combate", boss.Machine.CurrentName);
 
-        boss.TakeDamage(boss.healthFase2, Vector2.zero);
-        yield return new WaitForSeconds(BossIntroState.Duracao + 0.6f);
-        Assert.IsFalse(boss.Derrotado, "não pode morrer na fase 2");
-        Assert.AreEqual(3, boss.FaseAtual);
-
-        boss.TakeDamage(boss.healthFase3, Vector2.zero);
+        boss.TakeDamage(boss.maxHealth - 1, Vector2.zero);
         yield return null;
-        Assert.IsTrue(boss.Derrotado, "com as três fases zeradas ele cai");
+        Assert.IsFalse(boss.Derrotado, "ainda sobrava um ponto de vida");
+        Assert.AreEqual(1, boss.Health);
+
+        boss.TakeDamage(1, Vector2.zero);
+        yield return null;
+        Assert.IsTrue(boss.Derrotado, "com a vida zerada ele cai");
     }
 
     [UnityTest]
@@ -271,9 +249,8 @@ public class MundoEProgressaoTests
     }
 
     /// <summary>
-    /// Nasce desativado: o Awake do chefe copia healthFase1 para a vida atual,
-    /// então baixar a vida das fases depois de ele acordar não teria efeito e
-    /// os testes nunca chegariam na fase 2.
+    /// Nasce desativado: o Awake do chefe copia maxHealth para a vida atual,
+    /// então baixar a vida depois de ele acordar não teria efeito nenhum.
     /// </summary>
     GuardianBoss CriarChefe(Vector2 pos)
     {
@@ -288,12 +265,8 @@ public class MundoEProgressaoTests
         col.radius = 0.8f;
 
         var boss = go.AddComponent<GuardianBoss>();
-        boss.healthFase1 = 4;
-        boss.healthFase2 = 4;
-        boss.healthFase3 = 4;
+        boss.maxHealth = 4;
         boss.playerLayer = CenarioDeTeste.MaskPlayer;
-        boss.ecoPrefabs = new GameObject[0];
-        boss.pontosDeInvocacao = new Transform[0];
 
         go.SetActive(true);
         return boss;

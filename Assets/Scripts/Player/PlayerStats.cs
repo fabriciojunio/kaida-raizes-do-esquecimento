@@ -29,10 +29,6 @@ public class PlayerStats : ScriptableObject
     [Header("Habilidades desbloqueáveis")]
     public int airJumps = 1;                 // pulos extras no ar (double_jump)
     [Range(0f, 1f)] public float airJumpPower = 0.9f;  // força do pulo duplo vs. o normal
-    public float wallSlideSpeed = 3.5f;      // velocidade de descida agarrado (wall_climb)
-    public float wallJumpForceX = 9f;        // impulso lateral ao saltar da parede
-    [Range(0f, 1.5f)] public float wallJumpPower = 1f; // altura do salto de parede
-    public float wallJumpLockTime = 0.16f;   // trava o controle logo após saltar
 
     [Header("Dash")]
     public float dashSpeed = 18f;

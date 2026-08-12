@@ -7,10 +7,9 @@ using UnityEngine.TestTools;
 /// O golpe e a detecção de parede precisam funcionar dos dois lados.
 ///
 /// Virar de lado troca só o flipX do sprite, e os marcadores presos à Kaida
-/// (AttackPoint, WallCheck) continuavam parados à direita dela. Virada para a
+/// (AttackPoint) continuavam parados à direita dela. Virada para a
 /// esquerda, a caixa do golpe ficava atrás das costas: só acertava quem
-/// estivesse praticamente embaixo dela, e a parede da esquerda nunca era
-/// detectada, então não dava para subir um poço saltando de parede em parede.
+/// estivesse praticamente embaixo dela.
 ///
 /// A suíte antiga não pegou porque todo teste de combate posicionava o
 /// inimigo à direita.
@@ -76,38 +75,6 @@ public class GolpeParaOsDoisLadosTests
 
         Assert.AreEqual(antes, atras.Health,
             "o golpe acertou quem estava nas costas da Kaida");
-    }
-
-    [UnityTest]
-    public IEnumerator AParede_EhDetectadaDosDoisLados()
-    {
-        foreach (int lado in new[] { 1, -1 })
-        {
-            var kaida = CenarioDeTeste.CriarKaida(new Vector2(0f, 1f));
-            CenarioDeTeste.CriarParede(new Vector2(lado * 2f, 2f), new Vector2(1f, 6f));
-
-            yield return null;
-            kaida.SetFacing(lado);
-
-            // encosta de fato: a sonda parte de dentro do corpo dela, então
-            // medir a meia unidade da parede não diz nada sobre o contato
-            for (int i = 0; i < 20; i++)
-            {
-                kaida.SetVelocity(lado * 6f, 0f);
-                yield return new WaitForFixedUpdate();
-            }
-            kaida.SetVelocity(0f, 0f);
-            yield return new WaitForFixedUpdate();
-
-            Assert.IsTrue(kaida.IsTouchingWall(),
-                $"parede à {(lado > 0 ? "direita" : "esquerda")} não foi detectada. " +
-                "Sem isso não há salto de parede para aquele lado, e um poço " +
-                "vertical vira beco sem saída.");
-
-            CenarioDeTeste.Limpar();
-            CenarioDeTeste.CriarSistemas();
-            CenarioDeTeste.CriarChao(new Vector2(0f, -1f), new Vector2(80f, 2f));
-        }
     }
 
     [UnityTest]

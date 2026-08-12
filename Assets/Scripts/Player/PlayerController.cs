@@ -18,10 +18,6 @@ public class PlayerController : MonoBehaviour
     public float groundCheckRadius = 0.15f;
     public LayerMask groundLayer;
 
-    [Header("Detecção de parede (habilidade wall_climb)")]
-    public Transform wallCheck;            // um filho vazio na altura do tronco
-    public float wallCheckDistance = 0.28f;
-
     [Header("Combate")]
     public Transform attackPoint;          // ponto à frente do jogador
     public float attackRadius = 0.6f;
@@ -89,7 +85,6 @@ public class PlayerController : MonoBehaviour
         Machine.Add("attack", new PlayerAttackState(this));
         Machine.Add("hurt",   new PlayerHurtState(this));
         Machine.Add("dead",   new PlayerDeadState(this));
-        Machine.Add("wallcling", new PlayerWallClingState(this));
     }
 
     /// <summary>
@@ -118,7 +113,6 @@ public class PlayerController : MonoBehaviour
         coyoteTimer = Mathf.Max(0f, coyoteTimer - dt);
         jumpBufferTimer = Mathf.Max(0f, jumpBufferTimer - dt);
         dashCooldownTimer = Mathf.Max(0f, dashCooldownTimer - dt);
-        wallJumpLockTimer = Mathf.Max(0f, wallJumpLockTimer - dt);
         if (dashCooldownTimer == 0f) canDash = true;
     }
 
@@ -136,74 +130,13 @@ public class PlayerController : MonoBehaviour
     ///
     /// Virar de lado troca só o flipX do sprite: o objeto em si não gira, e os
     /// marcadores presos a ele continuam parados à direita. Sem espelhar aqui,
-    /// tudo que depende de "à frente" só funciona virado para a direita - o
-    /// golpe saía pelas costas e a parede da esquerda nunca era detectada.
+    /// tudo que depende de "à frente" só funciona virado para a direita: o
+    /// golpe saía pelas costas e só acertava quem estivesse embaixo dos pés.
     /// </summary>
     public Vector2 PontoAFrente(Transform marcador)
     {
         var local = marcador.localPosition;
         return transform.TransformPoint(new Vector3(local.x * facing, local.y, local.z));
-    }
-
-    /// <summary>Parede à frente na direção que o jogador encara.</summary>
-    public bool IsTouchingWall() => TemParedeNoLado(facing);
-
-    /// <summary>
-    /// Parede de verdade num dos lados: precisa responder na altura do tronco
-    /// e mais embaixo.
-    ///
-    /// Um raio só transformava a lateral de qualquer plataforma de uma unidade
-    /// em parede escalável, e a Kaida grudava no ar toda vez que passava
-    /// raspando por uma delas. As duas alturas ficam a quase uma unidade de
-    /// distância, então só superfície alta responde nas duas.
-    /// </summary>
-    bool TemParedeNoLado(int lado)
-    {
-        if (wallCheck == null || lado == 0) return false;
-
-        var local = wallCheck.localPosition;
-        return Sonda(local.x * lado, local.y, lado)
-            && Sonda(local.x * lado, local.y - 0.9f, lado);
-    }
-
-    bool Sonda(float x, float y, int lado)
-    {
-        Vector3 origem = transform.TransformPoint(new Vector3(x, y, 0f));
-        return Physics2D.Raycast(origem, Vector2.right * lado, wallCheckDistance, groundLayer);
-    }
-
-    /// <summary>
-    /// Lado onde existe parede ao alcance: +1 à direita, -1 à esquerda, 0 nenhuma.
-    ///
-    /// Olha para os dois lados, e não só para onde a Kaida encara. Quem cai
-    /// dentro de um poço encosta na parede antes de conseguir acertar a
-    /// direção, e exigir a tecla certa no frame exato do toque era o que fazia
-    /// a escalada parecer que não respondia.
-    /// </summary>
-    public int LadoDaParede()
-    {
-        if (TemParedeNoLado(facing)) return facing;       // o lado encarado tem preferência
-        if (TemParedeNoLado(-facing)) return -facing;
-        return 0;
-    }
-
-    /// <summary>
-    /// Condição de agarrar na parede: habilidade, estar no ar e ter parede ao
-    /// lado. Basta não estar empurrando para longe dela - soltar o controle
-    /// gruda, que é o comportamento que o jogador espera.
-    /// </summary>
-    public bool CanWallCling()
-    {
-        if (!HasAbility("wall_climb") || IsGrounded()) return false;
-
-        // logo após saltar de uma parede ela ainda está encostada nela: sem
-        // esta trava o salto era cancelado no frame seguinte e a Kaida
-        // simplesmente escorregava de volta
-        if (wallJumpLockTimer > 0f) return false;
-
-        int lado = LadoDaParede();
-        if (lado == 0) return false;
-        return !(Mathf.Abs(InputX) > 0.01f && Mathf.Sign(InputX) != lado);
     }
 
     /// <summary>Pulo no ar disponível (habilidade double_jump).</summary>
@@ -214,7 +147,6 @@ public class PlayerController : MonoBehaviour
     /// no Enter para aplicar a força reduzida em vez da força de pulo do chão.
     /// </summary>
     [HideInInspector] public bool pendingAirJump = false;
-    [HideInInspector] public float wallJumpLockTimer = 0f;
 
     public void ConsumeAirJump()
     {
@@ -375,12 +307,6 @@ public class PlayerController : MonoBehaviour
             Gizmos.color = Color.red;
             Gizmos.DrawWireCube(PontoAFrente(attackPoint),
                 new Vector3(attackRadius * 2f, attackRadius * 2.6f, 0f));
-        }
-        if (wallCheck != null)
-        {
-            Gizmos.color = Color.cyan;
-            Vector3 origem = PontoAFrente(wallCheck);
-            Gizmos.DrawLine(origem, origem + Vector3.right * facing * wallCheckDistance);
         }
     }
 }
