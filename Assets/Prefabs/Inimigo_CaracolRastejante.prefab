@@ -216,7 +216,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: babd2d82e290f8a40b97cb8ed00b405a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 4
+  maxHealth: 3
   contactDamage: 1
   moveSpeed: 1.1
   detectRange: 3.5
@@ -238,8 +238,8 @@ MonoBehaviour:
   animator: {fileID: 3419869870682278863}
   spriteRenderer: {fileID: 4872310457202644155}
   spriteOlhaParaEsquerda: 1
-  hideDuration: 1.6
-  hitsBeforeHiding: 1
+  hideDuration: 1.1
+  hitsBeforeHiding: 2
 --- !u!1 &7912851244837649486
 GameObject:
   m_ObjectHideFlags: 0

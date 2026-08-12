@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7556be4c9dbd7f94b80bc359a952dd2a, type: 3}
   m_Name: Copa3
   m_EditorClassIdentifier: 
-  sprite: {fileID: 7559748596892100388}
---- !u!213 &7559748596892100388
+  sprite: {fileID: 1399312759123468434}
+--- !u!213 &1399312759123468434
 Sprite:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

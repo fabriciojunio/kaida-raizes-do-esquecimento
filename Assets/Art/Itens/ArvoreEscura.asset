@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7556be4c9dbd7f94b80bc359a952dd2a, type: 3}
   m_Name: ArvoreEscura
   m_EditorClassIdentifier: 
-  sprite: {fileID: 2566236656805727678}
---- !u!213 &2566236656805727678
+  sprite: {fileID: 1433344876768346712}
+--- !u!213 &1433344876768346712
 Sprite:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
