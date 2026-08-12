@@ -220,7 +220,11 @@ public class PlayerController : MonoBehaviour
     public void DoAttackHit()
     {
         if (attackPoint == null) return;
-        Collider2D[] hits = Physics2D.OverlapCircleAll(attackPoint.position, attackRadius, enemyLayer);
+        // Área retangular, não circular: o golpe precisa alcançar tanto o
+        // javali rente ao chão quanto a abelha pairando acima da cabeça. Um
+        // círculo com raio suficiente para o alto avançaria longe demais.
+        var area = new Vector2(attackRadius * 2f, attackRadius * 2.6f);
+        Collider2D[] hits = Physics2D.OverlapBoxAll(attackPoint.position, area, 0f, enemyLayer);
         // um inimigo pode ter vários colliders: só conta um golpe por alvo
         var atingidos = new System.Collections.Generic.HashSet<object>();
         foreach (var h in hits)
@@ -308,7 +312,8 @@ public class PlayerController : MonoBehaviour
         if (attackPoint != null)
         {
             Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(attackPoint.position, attackRadius);
+            Gizmos.DrawWireCube(attackPoint.position,
+                new Vector3(attackRadius * 2f, attackRadius * 2.6f, 0f));
         }
         if (wallCheck != null)
         {

@@ -109,7 +109,7 @@ public static class SpriteSheetSetup
             return false;
         }
 
-        Vector2 pivo = CalcularPivo(tex);
+        Vector2 pivo = CalcularPivo(tex, larguraFrame);
         int quantidade = tex.width / larguraFrame;
         string nomeBase = System.IO.Path.GetFileNameWithoutExtension(caminho);
 
@@ -211,24 +211,51 @@ public static class SpriteSheetSetup
     }
 
     /// <summary>
-    /// Pivô no centro horizontal, na linha do pixel mais baixo com conteúdo.
-    /// É isso que mantém os pés no chão ao trocar de animação.
+    /// Pivô no centro horizontal, na linha dos pés.
+    ///
+    /// Só a faixa central de cada frame é examinada. Olhando a folha inteira,
+    /// o pixel mais baixo da animação de ataque é a ponta da espada, que
+    /// desce abaixo dos pés — o pivô saía 0,15 mais baixo que o do idle e a
+    /// personagem dava um pulo para cima toda vez que atacava.
     /// </summary>
-    static Vector2 CalcularPivo(Texture2D tex)
+    static Vector2 CalcularPivo(Texture2D tex, int larguraFrame)
     {
         var pixels = tex.GetPixels32();
         int w = tex.width, h = tex.height;
 
-        // GetPixels32 vem de baixo para cima: y=0 é a base da imagem
+        // Só o PRIMEIRO frame, e só a faixa central dele.
+        //
+        // Medir a folha inteira era o erro: em alguma pose do meio da
+        // animação de ataque o rastro do golpe desce abaixo dos pés, e o pivô
+        // da folha saía 0,15 mais baixo que o do idle. Resultado: a
+        // personagem subia meia unidade toda vez que atacava.
+        //
+        // O primeiro frame é sempre a pose de partida, com os pés apoiados —
+        // e nas folhas deste pacote os pés ficam na mesma linha em todas as
+        // animações de mesma altura de canvas.
+        var colunasDoCorpo = new System.Collections.Generic.List<int>();
+        int inicio = Mathf.RoundToInt(larguraFrame * 0.30f);
+        int fim = Mathf.RoundToInt(larguraFrame * 0.70f);
+        for (int x = inicio; x < fim && x < w; x++) colunasDoCorpo.Add(x);
+
+        // Exige uma quantidade mínima de pixels na linha, não apenas um.
+        // A ponta da espada e o rastro do golpe descem abaixo dos pés, mas
+        // ocupam poucos pixels por linha; a sola do pé ocupa vários. Sem esse
+        // limiar, o pivô da folha de ataque saía 0,15 mais baixo que o do
+        // idle e a personagem subia meia unidade toda vez que batia.
+        const int PixelsMinimosNaLinha = 5;
+
         int menorY = -1;
-        for (int y = 0; y < h; y++)
+        for (int y = 0; y < h && menorY < 0; y++)
         {
-            for (int x = 0; x < w; x++)
+            int opacos = 0;
+            foreach (int x in colunasDoCorpo)
             {
-                if (pixels[y * w + x].a != 0) { menorY = y; break; }
+                if (pixels[y * w + x].a != 0) opacos++;
+                if (opacos >= PixelsMinimosNaLinha) { menorY = y; break; }
             }
-            if (menorY >= 0) break;
         }
+
         if (menorY < 0) return new Vector2(0.5f, 0f);
         return new Vector2(0.5f, (float)menorY / h);
     }
