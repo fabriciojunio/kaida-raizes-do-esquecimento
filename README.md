@@ -1,4 +1,4 @@
-# Kaida — Raízes do Esquecimento
+# Kaida - Raízes do Esquecimento
 
 Metroidvania 2D desenvolvido em Unity 2022.3 para a disciplina de
 Desenvolvimento de Jogos Digitais, do curso de Ciência da Computação.
@@ -15,7 +15,7 @@ restou da própria memória.
 
 ## Como jogar
 
-### Opção 1 — baixar o jogo pronto (recomendado)
+### Opção 1 - baixar o jogo pronto (recomendado)
 
 Baixe o arquivo `Kaida-Windows.zip` na página de
 [**Releases**](https://github.com/fabriciojunio/kaida-raizes-do-esquecimento/releases/latest),
@@ -28,7 +28,7 @@ Não é preciso instalar mais nada. O jogo é para **Windows 64 bits**.
 > executável não tem assinatura digital paga, não porque haja algo errado
 > com o arquivo.
 
-### Opção 2 — abrir o projeto na engine
+### Opção 2 - abrir o projeto na engine
 
 1. Instale o **Unity 2022.3.62f3** pelo Unity Hub.
 2. No Unity Hub, clique em **Add** e aponte para a pasta deste projeto.
@@ -63,7 +63,8 @@ O jogo assume a resolução do monitor onde for aberto, de 4:3 a ultrawide.
 | Pausar | Esc |
 
 Pulo duplo e escalada de parede só funcionam depois de encontrar a
-habilidade correspondente no mapa — é um metroidvania.
+habilidade correspondente no mapa - é um metroidvania. A saída da Caverna
+Musgosa é um poço vertical: sem a escalada de parede não dá para passar.
 
 ## O jogo
 
@@ -78,16 +79,16 @@ Orla da Vila → Floresta Silente → Lago Silente → Caverna Musgosa → Santu
   investe, a abelha mergulha em diagonal, o caracol se fecha na casca e
   fica imune por um tempo
 - **Chefe final em três fases**, cada uma cobrando uma habilidade diferente
-- **Três dificuldades**, que mudam vida, invulnerabilidade e o
-  comportamento dos inimigos
+- **Três dificuldades**, escolhidas ao começar a partida, que mudam vida,
+  invulnerabilidade e o comportamento dos inimigos
 - **Colecionáveis**: fragmentos de lore e nódulos que aumentam a vida máxima
 - **Save automático** nos marcos de descanso
 
 ## Documentação
 
-- [`docs/GDD.md`](docs/GDD.md) — Game Design Document
-- [`docs/CONTRIBUICOES.md`](docs/CONTRIBUICOES.md) — divisão de tarefas
-- [`CREDITOS.md`](CREDITOS.md) — origem e licença dos assets
+- [`docs/GDD.md`](docs/GDD.md) - Game Design Document
+- [`docs/CONTRIBUICOES.md`](docs/CONTRIBUICOES.md) - divisão de tarefas
+- [`CREDITOS.md`](CREDITOS.md) - origem e licença dos assets
 
 Os créditos também aparecem **dentro do jogo**, pelo menu principal.
 
@@ -142,14 +143,14 @@ Ou pelo editor: **Window → General → Test Runner**.
 Boa parte dos testes nasceu de defeito encontrado jogando, e ficou para não
 deixar voltar:
 
-- **alcance dos mapas** — percorre as superfícies a partir do ponto de
+- **alcance dos mapas** - percorre as superfícies a partir do ponto de
   partida e reprova a região se alguma plataforma, item ou passagem ficar
   fora de alcance
-- **chão com colisão** — carrega cada região, solta a personagem e mede se
+- **chão com colisão** - carrega cada região, solta a personagem e mede se
   ela cai. Chão sem colisão não aparece em captura de tela nenhuma
-- **confronto com o chefe** — na cena real, porque um chefe montado à mão
+- **confronto com o chefe** - na cena real, porque um chefe montado à mão
   passava enquanto o do jogo estava inalcançável
-- **pivô das animações** — confere que os pés ficam alinhados entre idle,
+- **pivô das animações** - confere que os pés ficam alinhados entre idle,
   corrida e ataque
 
 ## Trilha sonora
@@ -161,6 +162,6 @@ para cada região. O volume pode ser ajustado no menu.
 
 ## Créditos de arte
 
-A arte vem do pacote **Legacy Fantasy — High Forest**, de **Anokolisa**
+A arte vem do pacote **Legacy Fantasy - High Forest**, de **Anokolisa**
 (gratuito, uso comercial permitido), e do **Stringstar Fields**. Detalhes em
 [`CREDITOS.md`](CREDITOS.md).

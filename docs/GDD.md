@@ -1,10 +1,10 @@
-# KAIDA — RAÍZES DO ESQUECIMENTO
+# KAIDA - RAÍZES DO ESQUECIMENTO
 ### Game Design Document
 
 **Equipe:** Fabrício Júnio Almeida Dias · Camila Pereira Raimundo ·
 Luan Miranda Padilha · Kauã Limão Nunes
 
-**Disciplina:** Desenvolvimento de Jogos Digitais — Ciência da Computação
+**Disciplina:** Desenvolvimento de Jogos Digitais - Ciência da Computação
 
 ---
 
@@ -29,7 +29,7 @@ Luan Miranda Padilha · Kauã Limão Nunes
 
 ## 1. Introdução
 
-**Kaida — Raízes do Esquecimento** é um metroidvania 2D de ação e
+**Kaida - Raízes do Esquecimento** é um metroidvania 2D de ação e
 exploração, em que a jogadora controla Kaida, uma espadachim que acorda sem
 memória num vale amaldiçoado e precisa alcançar a criatura responsável pelo
 Esquecimento.
@@ -43,7 +43,7 @@ personagem consegue fazer, e não como fases isoladas.
 As referências principais são *Hollow Knight* (atmosfera, progressão por
 habilidades, mapa interconectado) e a série *Prince of Persia* (a sensação
 do movimento: fluidez, precisão, quedas calculadas). Nenhum conteúdo desses
-jogos foi reutilizado — a inspiração é de design.
+jogos foi reutilizado - a inspiração é de design.
 
 ## 2. Público-alvo
 
@@ -62,7 +62,7 @@ para o dia, os moradores pararam de lembrar quem eram. Alguns definharam;
 outros se corromperam, viraram cascas movidas por instinto, vagando pelas
 ruínas das próprias casas.
 
-**Kaida** acorda na orla da floresta sem lembrança de como chegou ali — só
+**Kaida** acorda na orla da floresta sem lembrança de como chegou ali - só
 uma espada nas costas e a sensação de já ter estado naquele vale. No coração
 do mapa dorme o **Guardião do Lúmen**, que antes protegia a memória coletiva
 e hoje a consome para se manter inteiro.
@@ -90,7 +90,7 @@ O jogo assume a resolução nativa do monitor e funciona de 4:3 a ultrawide
 
 ### 5.1 Protagonista
 
-**Kaida** — espadachim sem memória. Move-se com agilidade: corre, dá dash,
+**Kaida** - espadachim sem memória. Move-se com agilidade: corre, dá dash,
 pula com altura variável e, conforme avança, ganha pulo duplo e escalada de
 parede. Começa com 5 pontos de vida no modo Normal.
 
@@ -104,7 +104,7 @@ parede. Começa com 5 pontos de vida no modo Normal.
 
 ### 5.3 Chefe
 
-**O Guardião do Lúmen** — criatura flutuante corrompida pelo mineral que
+**O Guardião do Lúmen** - criatura flutuante corrompida pelo mineral que
 deveria proteger. Três fases, cada uma cobrando uma habilidade diferente:
 
 | Fase | Comportamento | Vida | Habilidade cobrada |
@@ -114,7 +114,7 @@ deveria proteger. Três fases, cada uma cobrando uma habilidade diferente:
 | 3 | Investidas corpo a corpo rápidas, com feixes cortando a fuga | 16 | Pulo duplo e parede, para não ser encurralada |
 
 Entre as fases há uma transição em que ele fica intocável e o campo é
-limpo — um respiro de leitura, que separa "difícil" de "injusto".
+limpo - um respiro de leitura, que separa "difícil" de "injusto".
 
 ## 6. Cenários
 
@@ -143,7 +143,7 @@ até o fim termina o jogo; quem explora entende o que aconteceu no vale.
 | Região | Fragmento |
 |---|---|
 | Orla da Vila | *"Acordei na orla sem saber o próprio nome. A espada nas costas parecia me conhecer melhor do que eu."* |
-| Floresta Silente | *"A floresta guardava a memória do povo. Quando o Esquecimento veio, ela escureceu primeiro — como quem fecha os olhos."* |
+| Floresta Silente | *"A floresta guardava a memória do povo. Quando o Esquecimento veio, ela escureceu primeiro - como quem fecha os olhos."* |
 | Lago Silente | *"Tiravam lúmen daqui. Diziam que a pedra segurava lembranças. Ninguém perguntou de quem eram."* |
 | Caverna Musgosa | *"Parar também é uma forma de esquecer."* |
 
@@ -156,12 +156,21 @@ através dele. O desfecho fica em aberto de propósito.
 | Habilidade | Onde é obtida | O que libera |
 |---|---|---|
 | Movimento, ataque e dash | Início | Base do jogo |
-| **Pulo Duplo** | Fim da Floresta Silente | Plataformas altas, travessia do lago |
-| **Escalada de Parede** | Fim da Caverna Musgosa | Poços verticais, atalhos de volta |
+| **Pulo Duplo** | Alto da Floresta Silente | Plataformas e coletáveis fora da rota; encurta a travessia do lago |
+| **Escalada de Parede** | Alto da Caverna Musgosa | O poço de saída da Caverna, que é obrigatório |
 
-As habilidades ficam gravadas no save. Passagens que exigem uma habilidade
-não permitem passagem antes dela, e coletáveis já pegos não reaparecem ao
-revisitar uma sala.
+As habilidades ficam gravadas no save e coletáveis já pegos não reaparecem
+ao revisitar uma sala.
+
+A Caverna Musgosa termina num poço vertical de treze unidades, fechado por
+duas paredes de frente uma para a outra. Não há rota pelo chão: a saída da
+região fica no alto, e só se chega lá saltando de parede em parede. É o
+trecho que cobra a habilidade da própria região, e o motivo de a escalada
+ficar antes do poço no traçado do mapa.
+
+O Pulo Duplo é opcional por decisão de projeto: ele abre atalhos e alcança
+os nódulos de vida escondidos, mas nenhum caminho obrigatório depende dele.
+Quem joga sem perceber que pegou a habilidade ainda termina o jogo.
 
 ## 9. Itens e recompensas
 
@@ -174,8 +183,8 @@ revisitar uma sala.
 ## 10. Vitória e derrota
 
 **Vitória:** derrotar as três fases do Guardião no Santuário Esquecido. A
-tela final mostra o balanço da jornada — fragmentos encontrados, nódulos
-reunidos e habilidades despertadas — e oferece jogar de novo ou voltar ao
+tela final mostra o balanço da jornada - fragmentos encontrados, nódulos
+reunidos e habilidades despertadas - e oferece jogar de novo ou voltar ao
 menu.
 
 **Derrota:** a vida chega a zero. A tela de morte conta as quedas da sessão
@@ -189,7 +198,7 @@ para os pixels ficarem nítidos. A personagem tem cerca de 3 tiles de
 altura.
 
 **Paleta:** fria e dessaturada (musgo, pedra, azul-acinzentado), com pontos
-de luz quente — o lúmen, as tochas — para guiar o olhar e representar
+de luz quente - o lúmen, as tochas - para guiar o olhar e representar
 "memória viva" no meio da decadência. Cada região aplica um tom próprio
 sobre o mesmo tileset.
 
@@ -216,7 +225,7 @@ Cada região tem tônica e andamento próprios:
 | Santuário Esquecido | Ré (146,83 Hz) | 1,55 s |
 
 Quanto mais fundo no vale, mais grave e arrastada a música. O volume é
-baixo de propósito — é som ambiente — e ajustável no menu.
+baixo de propósito - é som ambiente - e ajustável no menu.
 
 ## 13. Mecânicas e jogabilidade
 
@@ -250,7 +259,7 @@ nunca no meio da lógica.
 ### 13.3 Combate
 
 O ataque procura qualquer coisa que implemente `IDamageable` numa área à
-frente da personagem — assim o mesmo golpe serve para inimigo comum e para
+frente da personagem - assim o mesmo golpe serve para inimigo comum e para
 o chefe, sem o jogador precisar conhecer cada tipo.
 
 Ao apanhar, Kaida recebe empurrão na direção contrária e uma janela de
@@ -277,6 +286,10 @@ no meio do caminho viraria teto.
 | Invulnerabilidade | 1,5 s | 1,0 s | 0,65 s |
 | Velocidade dos inimigos | 85% | 100% | 125% |
 | Alcance de visão deles | 80% | 100% | 130% |
+
+A escolha aparece ao clicar em *Novo jogo*, e não num submenu à parte: a
+dificuldade vale para a partida inteira, então é uma pergunta que o jogo
+precisa fazer antes de começar, não uma opção que dá para nunca abrir.
 
 ### 13.7 Salvamento
 
