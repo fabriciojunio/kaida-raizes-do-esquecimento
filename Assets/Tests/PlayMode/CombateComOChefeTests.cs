@@ -68,6 +68,59 @@ public class CombateComOChefeTests
     }
 
     [UnityTest]
+    public IEnumerator OChefe_MorreDepoisDasTresFases()
+    {
+        // O teste mais importante do jogo: dá para terminar. Ele percorre o
+        // confronto inteiro batendo no Guardião até as três fases caírem.
+        // Nenhum teste cobria isso, e a fase 2 estava intransponível.
+        SceneManager.LoadScene("05_SantuarioEsquecido");
+        yield return null;
+        yield return null;
+
+        var boss = Object.FindObjectOfType<GuardianBoss>();
+        var kaida = Object.FindObjectOfType<PlayerController>();
+        Assert.IsNotNull(boss);
+        Assert.IsNotNull(kaida);
+
+        kaida.isInvulnerable = true;   // aqui se mede o dano dado, não o sofrido
+
+        yield return new WaitForSeconds(BossIntroState.Duracao + 0.5f);
+
+        var fasesVistas = new System.Collections.Generic.HashSet<int>();
+        float limite = 90f;
+        float gasto = 0f;
+
+        while (!boss.Derrotado && gasto < limite)
+        {
+            fasesVistas.Add(boss.FaseAtual);
+
+            // encosta na criatura e golpeia, que é o que o jogador faz
+            kaida.transform.position = boss.transform.position + new Vector3(-1.7f, -0.5f, 0f);
+            kaida.SetFacing(1);
+            yield return new WaitForFixedUpdate();
+            kaida.DoAttackHit();
+
+            // derruba os ecos da fase 2 junto, senão ele não desce
+            foreach (var eco in Object.FindObjectsOfType<EnemyController>())
+                if (eco != null && !eco.Dying) eco.TakeDamage(99, kaida.transform.position);
+
+            for (float t = 0f; t < 0.25f; t += Time.fixedDeltaTime)
+            {
+                yield return new WaitForFixedUpdate();
+                gasto += Time.fixedDeltaTime;
+            }
+        }
+
+        Assert.IsTrue(boss.Derrotado,
+            $"o Guardião não caiu em {limite:F0} segundos de combate. " +
+            $"Parou na fase {boss.FaseAtual} com {boss.Health} de vida, " +
+            $"estado {boss.Machine.CurrentName}. Fases alcançadas: " +
+            string.Join(", ", fasesVistas));
+
+        CollectionAssert.Contains(fasesVistas, 3, "o confronto nunca chegou à fase 3");
+    }
+
+    [UnityTest]
     public IEnumerator Chefe_DesceQuandoAOndaDeEcosEhLimpa()
     {
         // A fase 2 é a única em que ele se afasta de propósito. Se ele não

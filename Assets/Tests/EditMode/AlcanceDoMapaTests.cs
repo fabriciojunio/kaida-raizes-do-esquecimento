@@ -192,9 +192,10 @@ public class AlcanceDoMapaTests
             var a = poco.area;
             var semParede = new List<int>();
 
-            // metade de baixo do poço: é onde a subida começa e onde faltar
-            // parede trava o jogador
-            for (int y = Mathf.CeilToInt(a.yMin) + 2; y < Mathf.FloorToInt(a.yMax) - 1; y++)
+            // Miolo do poço. A entrada, embaixo, e a saída, em cima, são
+            // abertas de propósito: é por onde se entra e por onde se sai.
+            // O que não pode faltar é parede no trecho que se escala.
+            for (int y = Mathf.CeilToInt(a.yMin + 3f); y <= Mathf.FloorToInt(a.yMax - 2.5f); y++)
             {
                 bool esquerda = false, direita = false;
                 for (int x = Mathf.CeilToInt(a.xMin); x <= Mathf.FloorToInt(a.xMax); x++)
@@ -205,8 +206,7 @@ public class AlcanceDoMapaTests
                 if (!esquerda || !direita) semParede.Add(y);
             }
 
-            // as duas fileiras do topo podem ser abertas: é a saída do poço
-            Assert.LessOrEqual(semParede.Count, 2,
+            Assert.IsEmpty(semParede,
                 $"o poço em {a} não tem parede dos dois lados nas alturas " +
                 string.Join(", ", semParede));
 
