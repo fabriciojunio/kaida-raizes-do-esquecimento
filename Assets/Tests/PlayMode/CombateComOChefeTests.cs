@@ -68,6 +68,45 @@ public class CombateComOChefeTests
     }
 
     [UnityTest]
+    public IEnumerator Chefe_DesceQuandoAOndaDeEcosEhLimpa()
+    {
+        // A fase 2 é a única em que ele se afasta de propósito. Se ele não
+        // voltar depois que os ecos caem, a fase não tem como terminar: o
+        // ataque da Kaida é corpo a corpo e o chefe fica pairando fora de
+        // alcance para sempre.
+        SceneManager.LoadScene("05_SantuarioEsquecido");
+        yield return null;
+        yield return null;
+
+        var boss = Object.FindObjectOfType<GuardianBoss>();
+        var kaida = Object.FindObjectOfType<PlayerController>();
+        Assert.IsNotNull(boss);
+
+        yield return new WaitForSeconds(BossIntroState.Duracao + 0.5f);
+        boss.AvancarFase();
+        Assert.AreEqual("fase2", boss.Machine.CurrentName, "não entrou na fase 2");
+
+        // deixa a onda entrar em campo e derruba todos os ecos de uma vez
+        yield return new WaitForSeconds(1.5f);
+        var ecos = Object.FindObjectsOfType<EnemyController>();
+        Assert.Greater(ecos.Length, 0, "a fase 2 não chamou nenhum eco");
+        foreach (var e in ecos) Object.Destroy(e.gameObject);
+        yield return null;
+
+        float melhorDistancia = float.MaxValue;
+        for (float t = 0f; t < 5f; t += Time.fixedDeltaTime)
+        {
+            yield return new WaitForFixedUpdate();
+            melhorDistancia = Mathf.Min(melhorDistancia,
+                Mathf.Abs(boss.transform.position.y - kaida.transform.position.y));
+        }
+
+        Assert.Less(melhorDistancia, 3.5f,
+            $"com a onda limpa o chefe ficou a {melhorDistancia:F1} unidades de " +
+            "altura do jogador: a fase 2 não abre janela de dano.");
+    }
+
+    [UnityTest]
     public IEnumerator Chefe_DesceAteAAlturaDoJogador()
     {
         SceneManager.LoadScene("05_SantuarioEsquecido");

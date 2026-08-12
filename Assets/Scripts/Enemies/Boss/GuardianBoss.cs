@@ -134,8 +134,12 @@ public class GuardianBoss : MonoBehaviour, IDamageable
             brb.velocity = direcao.normalized * beamSpeed;
     }
 
-    /// <summary>Invoca ecos fracos dos inimigos que o jogador já enfrentou.</summary>
-    public int InvocarEcos(int quantidade)
+    /// <summary>
+    /// Invoca ecos fracos dos inimigos que o jogador já enfrentou. Quem chamou
+    /// pode passar uma lista para receber os ecos criados e acompanhar só
+    /// esta onda, em vez de contar todos os inimigos da cena.
+    /// </summary>
+    public int InvocarEcos(int quantidade, System.Collections.Generic.List<EnemyController> registro = null)
     {
         if (ecoPrefabs == null || ecoPrefabs.Length == 0) return 0;
         if (pontosDeInvocacao == null || pontosDeInvocacao.Length == 0) return 0;
@@ -154,19 +158,13 @@ public class GuardianBoss : MonoBehaviour, IDamageable
             {
                 ec.maxHealth = Mathf.Max(1, ec.maxHealth / 2);
                 ec.moveSpeed *= 1.15f;
+                registro?.Add(ec);
             }
             var sr = eco.GetComponentInChildren<SpriteRenderer>();
             if (sr != null) sr.color = new Color(0.75f, 0.85f, 1f, 0.8f);
             criados++;
         }
         return criados;
-    }
-
-    public bool AindaTemEcos()
-    {
-        foreach (var e in FindObjectsOfType<EnemyController>())
-            if (e != null && !e.Dying) return true;
-        return false;
     }
 
     public void AtingirJogadorSeEncostou(float raio)
