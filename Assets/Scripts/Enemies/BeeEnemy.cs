@@ -17,11 +17,18 @@ public class BeeEnemy : EnemyController
     public float diveCooldown = 2.2f;
     public float returnSpeed = 4f;
 
-    enum Phase { Voando, Mergulhando, Voltando }
+    [Header("Janela de contra-ataque")]
+    [Tooltip("Tempo pairando na altura do jogador depois do mergulho. É a " +
+             "janela em que dá para revidar — sem ela a abelha volta para o " +
+             "alto e o ataque corpo a corpo nunca alcança.")]
+    public float tempoPairando = 1.1f;
+
+    enum Phase { Voando, Mergulhando, Pairando, Voltando }
     Phase phase = Phase.Voando;
     Vector3 anchor;        // ponto de voo (altura de descanso)
     Vector2 diveTarget;
     float diveTimer;
+    float pairarTimer;
     float wanderDir = 1f;
 
     protected override void Awake()
@@ -42,7 +49,27 @@ public class BeeEnemy : EnemyController
         {
             case Phase.Voando:      TickVoando();      break;
             case Phase.Mergulhando: TickMergulhando(); break;
+            case Phase.Pairando:    TickPairando();    break;
             case Phase.Voltando:    TickVoltando();    break;
+        }
+    }
+
+    /// <summary>Fica quase parada, na altura em que chegou, dando a brecha.</summary>
+    void TickPairando()
+    {
+        if (animator != null) animator.Play("fly");
+
+        pairarTimer -= Time.deltaTime;
+        rb.velocity = new Vector2(Mathf.Sin(Time.time * 3f) * 0.5f,
+                                  Mathf.Cos(Time.time * 4f) * 0.35f);
+
+        var hit = Physics2D.OverlapCircle(transform.position, attackRange, playerLayer);
+        if (hit != null) { target = hit.transform; TryContactAttack(); }
+
+        if (pairarTimer <= 0f)
+        {
+            phase = Phase.Voltando;
+            diveTimer = diveCooldown;
         }
     }
 
@@ -71,8 +98,8 @@ public class BeeEnemy : EnemyController
         Vector2 dir = (diveTarget - (Vector2)transform.position);
         if (dir.magnitude < 0.35f || HasWallAhead())
         {
-            phase = Phase.Voltando;
-            diveTimer = diveCooldown;
+            phase = Phase.Pairando;              // fica ao alcance por um tempo
+            pairarTimer = tempoPairando;
             return;
         }
         rb.velocity = dir.normalized * diveSpeed;
@@ -93,6 +120,20 @@ public class BeeEnemy : EnemyController
         Vector2 dir = (anchor - transform.position);
         if (dir.magnitude < 0.3f) { phase = Phase.Voando; return; }
         rb.velocity = dir.normalized * returnSpeed;
+    }
+
+    /// <summary>
+    /// Ao ser ferida ela recua, mas sem subir para fora de alcance: o
+    /// contra-ataque precisa continuar possível. Antes ela voltava direto
+    /// para a âncora, alto demais para o golpe corpo a corpo alcançar.
+    /// </summary>
+    public override void TakeDamage(int amount, Vector2 sourcePos)
+    {
+        base.TakeDamage(amount, sourcePos);
+        if (dying) return;
+
+        phase = Phase.Voltando;
+        diveTimer = Mathf.Min(diveTimer, 0.6f);
     }
 
     /// <summary>Voadora não tem chão para checar: nunca "cai" da plataforma.</summary>

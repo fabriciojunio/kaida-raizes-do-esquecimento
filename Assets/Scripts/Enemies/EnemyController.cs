@@ -30,9 +30,16 @@ public class EnemyController : MonoBehaviour, IDamageable
     [Tooltip("Se ligado, o inimigo só persegue quem ele realmente enxerga.")]
     public bool requireLineOfSight = true;
 
+    [Tooltip("Altura dos olhos a partir do pivô, que fica nos pés.")]
+    public float alturaDosOlhos = 0.7f;
+
     [Header("Animação (opcional)")]
     public Animator animator;
     public SpriteRenderer spriteRenderer;
+
+    [Tooltip("Marque se o desenho original olha para a esquerda. Os três " +
+             "inimigos deste pacote olham; sem isso eles andam de costas.")]
+    public bool spriteOlhaParaEsquerda = true;
 
     protected Rigidbody2D rb;
     protected int health;
@@ -66,9 +73,43 @@ public class EnemyController : MonoBehaviour, IDamageable
         if (dying) return;
         attackTimer = Mathf.Max(0f, attackTimer - Time.deltaTime);
 
+        FerirQuemEncostar();
+
         FindPlayer();
         if (target != null) ChaseAndAttack();
         else Patrol();
+    }
+
+    /// <summary>
+    /// Dano por encostar, medido pela sobreposição real dos colisores.
+    ///
+    /// Antes o dano dependia da distância entre os pivôs, que ficam nos pés:
+    /// um javali colado no jogador podia registrar "longe" e não machucar
+    /// ninguém. Encostou, dói.
+    /// </summary>
+    protected void FerirQuemEncostar()
+    {
+        if (attackTimer > 0f) return;
+
+        var meuColisor = GetComponent<Collider2D>();
+        if (meuColisor == null) return;
+
+        var filtro = new ContactFilter2D();
+        filtro.SetLayerMask(playerLayer);
+        filtro.useTriggers = false;
+
+        var encostados = new Collider2D[4];
+        int quantos = meuColisor.OverlapCollider(filtro, encostados);
+
+        for (int i = 0; i < quantos; i++)
+        {
+            var pc = encostados[i].GetComponentInParent<PlayerController>();
+            if (pc == null) continue;
+
+            pc.TakeDamage(contactDamage, transform.position);
+            attackTimer = attackCooldown;
+            return;
+        }
     }
 
     protected virtual void FindPlayer()
@@ -78,9 +119,14 @@ public class EnemyController : MonoBehaviour, IDamageable
 
         if (requireLineOfSight)
         {
-            // sem isso o inimigo "vê" através de paredes e fica preso empurrando pedra
-            Vector2 origin = transform.position;
-            Vector2 dir = (Vector2)hit.transform.position - origin;
+            // Na altura do peito, não dos pés. Os pivôs ficam na base dos
+            // sprites, então um raio de pé a pé corre rente ao chão e bate no
+            // próprio piso: o inimigo nunca enxergava o jogador e nunca
+            // chegava a atacar.
+            Vector2 origin = (Vector2)transform.position + Vector2.up * alturaDosOlhos;
+            Vector2 alvo = (Vector2)hit.transform.position + Vector2.up * 1.4f;
+            Vector2 dir = alvo - origin;
+
             var blocked = Physics2D.Raycast(origin, dir.normalized, dir.magnitude, groundLayer);
             if (blocked.collider != null) { target = null; return; }
         }
@@ -172,7 +218,8 @@ public class EnemyController : MonoBehaviour, IDamageable
         if (dir != 0 && dir != facing)
         {
             facing = dir;
-            if (spriteRenderer != null) spriteRenderer.flipX = (facing < 0);
+            if (spriteRenderer != null)
+                spriteRenderer.flipX = spriteOlhaParaEsquerda ? (facing > 0) : (facing < 0);
             RepositionChecks();
         }
     }
