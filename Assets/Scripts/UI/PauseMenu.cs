@@ -16,6 +16,7 @@ public class PauseMenu : MonoBehaviour
 
     void Awake()
     {
+        TelaModal.Zerar();
         Montar();
         Esconder();
         Pausado = false;
@@ -78,6 +79,7 @@ public class PauseMenu : MonoBehaviour
 
     void Mostrar()
     {
+        TelaModal.Abriu();
         grupo.alpha = 1f;
         grupo.interactable = true;
         grupo.blocksRaycasts = true;
@@ -85,6 +87,7 @@ public class PauseMenu : MonoBehaviour
 
     void Esconder()
     {
+        if (grupo != null && grupo.alpha > 0f) TelaModal.Fechou();
         grupo.alpha = 0f;
         grupo.interactable = false;
         grupo.blocksRaycasts = false;

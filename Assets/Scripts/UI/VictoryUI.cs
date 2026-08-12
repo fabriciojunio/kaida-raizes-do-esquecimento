@@ -36,6 +36,7 @@ public class VictoryUI : MonoBehaviour
 
     void Mostrar()
     {
+        TelaModal.Abriu();
         if (resumo != null) resumo.text = MontarResumo();
         grupo.alpha = 1f;
         grupo.interactable = true;

@@ -49,6 +49,7 @@ public class GameOverUI : MonoBehaviour
 
     void Continuar()
     {
+        TelaModal.Fechou();
         Esconder();
         Time.timeScale = 1f;
         if (GameManager.Instance != null) GameManager.Instance.RespawnPlayer();
@@ -63,6 +64,7 @@ public class GameOverUI : MonoBehaviour
 
     void Mostrar()
     {
+        TelaModal.Abriu();
         grupo.alpha = 1f;
         grupo.interactable = true;
         grupo.blocksRaycasts = true;
