@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!213 &-7227627418840171249
+--- !u!213 &-7610919253321347296
 Sprite:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -222,4 +222,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7556be4c9dbd7f94b80bc359a952dd2a, type: 3}
   m_Name: ArvoreEscura
   m_EditorClassIdentifier: 
-  sprite: {fileID: -7227627418840171249}
+  sprite: {fileID: -7610919253321347296}

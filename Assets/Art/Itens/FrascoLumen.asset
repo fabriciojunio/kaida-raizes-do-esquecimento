@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7556be4c9dbd7f94b80bc359a952dd2a, type: 3}
   m_Name: FrascoLumen
   m_EditorClassIdentifier: 
-  sprite: {fileID: 4164877240600036181}
---- !u!213 &4164877240600036181
+  sprite: {fileID: 5293234284943898067}
+--- !u!213 &5293234284943898067
 Sprite:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

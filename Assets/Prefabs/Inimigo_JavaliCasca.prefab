@@ -203,8 +203,10 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   requireLineOfSight: 1
+  alturaDosOlhos: 0.7
   animator: {fileID: 127420712934527623}
   spriteRenderer: {fileID: 7757568123206986930}
+  spriteOlhaParaEsquerda: 1
   telegraphTime: 0.45
   chargeSpeed: 8.5
   chargeDuration: 0.9

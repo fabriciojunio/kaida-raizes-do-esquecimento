@@ -31,7 +31,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2.6, y: 2.6, z: 2.6}
+  m_LocalScale: {x: 2.1, y: 2.1, z: 2.1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1537617066039014185}
@@ -97,7 +97,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3636296404411592742}
-  m_BodyType: 0
+  m_BodyType: 1
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
@@ -145,12 +145,12 @@ CircleCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 1.4}
+  m_Offset: {x: 0, y: 0.9}
   serializedVersion: 2
-  m_Radius: 0.75
+  m_Radius: 1.15
 --- !u!95 &1495632787467614775
 Animator:
   serializedVersion: 5
@@ -189,18 +189,18 @@ MonoBehaviour:
   healthFase3: 16
   beamPrefab: {fileID: 8736481027719437747, guid: f861db359af20ea458b2bba0d2306a59, type: 3}
   beamOrigin: {fileID: 1537617066039014185}
-  beamInterval: 1.5
-  beamSpeed: 7
+  beamInterval: 2.4
+  beamSpeed: 6
   beamsPorSalva: 3
   ecoPrefabs:
   - {fileID: 764546454367054960, guid: f3671d789415dd0489b68a259bb93d81, type: 3}
   - {fileID: 6284102995222294469, guid: 4e4d549f111fec048861ff053b9a6be3, type: 3}
   - {fileID: 3932018699711819333, guid: 7ad86ea1f8c975c48ae005cf26d1d20c, type: 3}
   pontosDeInvocacao: []
-  ecosPorOnda: 3
-  intervaloEntreOndas: 6
-  velocidadeInvestida: 7.5
-  intervaloInvestida: 1.6
+  ecosPorOnda: 2
+  intervaloEntreOndas: 8
+  velocidadeInvestida: 6
+  intervaloInvestida: 2.4
   danoContato: 1
   animator: {fileID: 1495632787467614775}
   spriteRenderer: {fileID: 188979561841723676}

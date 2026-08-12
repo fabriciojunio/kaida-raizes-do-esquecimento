@@ -234,14 +234,17 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   requireLineOfSight: 1
+  alturaDosOlhos: 0.7
   animator: {fileID: 7522316587053482493}
   spriteRenderer: {fileID: 5028964817585858784}
+  spriteOlhaParaEsquerda: 1
   amplitude: 0.7
   frequency: 2.2
   horizontalRange: 3
   diveSpeed: 9
   diveCooldown: 2.4
   returnSpeed: 4
+  tempoPairando: 1.1
 --- !u!1 &7455982854062697296
 GameObject:
   m_ObjectHideFlags: 0

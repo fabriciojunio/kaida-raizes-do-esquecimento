@@ -234,8 +234,10 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   requireLineOfSight: 1
+  alturaDosOlhos: 0.7
   animator: {fileID: 3419869870682278863}
   spriteRenderer: {fileID: 4872310457202644155}
+  spriteOlhaParaEsquerda: 1
   hideDuration: 1.6
   hitsBeforeHiding: 1
 --- !u!1 &7912851244837649486
