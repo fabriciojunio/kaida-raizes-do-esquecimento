@@ -30,6 +30,7 @@ public class CapturaDeInterfaceTests
     public void Depois()
     {
         Time.timeScale = 1f;
+        CenarioDeTeste.Limpar();
     }
 
     /// <summary>
@@ -187,7 +188,7 @@ public class CapturaDeInterfaceTests
         Assert.IsNotNull(boss, "o Guardião não está na cena final");
 
         // passa a introdução e derruba as três fases
-        yield return new WaitForSecondsRealtime(2.6f);
+        yield return new WaitForSecondsRealtime(BossIntroState.Duracao + 0.8f);
         for (int fase = 0; fase < 3; fase++)
         {
             boss.TakeDamage(999, Vector2.zero);

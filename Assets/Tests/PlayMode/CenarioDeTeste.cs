@@ -154,12 +154,33 @@ public static class CenarioDeTeste
         return f.transform;
     }
 
-    /// <summary>Limpa tudo entre um teste e outro, inclusive os singletons.</summary>
+    /// <summary>
+    /// Limpa tudo entre um teste e outro, inclusive os singletons e o que
+    /// tiver sobrado de uma cena real carregada por outro teste.
+    ///
+    /// Sem essa varredura, os testes que abrem as regiões de verdade deixavam
+    /// inimigos e o Guardião vivos em cena; o teste seguinte montava o próprio
+    /// cenário por cima e media o objeto errado.
+    /// </summary>
     public static void Limpar()
     {
-        foreach (var go in Object.FindObjectsOfType<GameObject>())
+        foreach (var go in Object.FindObjectsOfType<GameObject>(true))
         {
-            if (go != null && go.scene.isLoaded) Object.DestroyImmediate(go);
+            if (go == null) continue;
+            if (go.transform.parent != null) continue;   // filhos vão junto do pai
+            Object.DestroyImmediate(go);
         }
+    }
+
+    /// <summary>
+    /// Começa o teste num ambiente vazio, sem restos de cena anterior.
+    /// Chamado no início de cada SetUp.
+    /// </summary>
+    public static void PrepararAmbiente()
+    {
+        Limpar();
+        Time.timeScale = 1f;
+        Physics2D.IgnoreLayerCollision(LayerPlayer, LayerEnemy, true);
+        GameSettings.Atual = Dificuldade.Normal;
     }
 }

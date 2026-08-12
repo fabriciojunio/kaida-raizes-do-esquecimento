@@ -13,10 +13,11 @@ public class MovimentoTests
     [SetUp]
     public void Antes()
     {
-        // Um teste de pausa, morte ou vitória congela o tempo. Se ele
-        // vazar para cá, a física não avança e nada assenta no chão —
-        // as falhas aparecem em testes que não têm nada a ver.
-        Time.timeScale = 1f;
+        // Ambiente limpo: tempo normal, camadas configuradas e sem restos
+        // de cena de outro teste. Sem isso, um teste que congela o tempo ou
+        // que abre uma região de verdade derruba os seguintes com erros que
+        // não têm nada a ver com a causa.
+        CenarioDeTeste.PrepararAmbiente();
 
         Physics2D.IgnoreLayerCollision(CenarioDeTeste.LayerPlayer, CenarioDeTeste.LayerEnemy, true);
         CenarioDeTeste.CriarSistemas();

@@ -13,10 +13,11 @@ public class MundoEProgressaoTests
     [SetUp]
     public void Antes()
     {
-        // Um teste de pausa, morte ou vitória congela o tempo. Se ele
-        // vazar para cá, a física não avança e nada assenta no chão —
-        // as falhas aparecem em testes que não têm nada a ver.
-        Time.timeScale = 1f;
+        // Ambiente limpo: tempo normal, camadas configuradas e sem restos
+        // de cena de outro teste. Sem isso, um teste que congela o tempo ou
+        // que abre uma região de verdade derruba os seguintes com erros que
+        // não têm nada a ver com a causa.
+        CenarioDeTeste.PrepararAmbiente();
 
         Physics2D.IgnoreLayerCollision(CenarioDeTeste.LayerPlayer, CenarioDeTeste.LayerEnemy, true);
         CenarioDeTeste.CriarSistemas();
@@ -192,7 +193,7 @@ public class MundoEProgressaoTests
     {
         var boss = CriarChefe(new Vector2(20f, 5f));
         yield return null;
-        yield return new WaitForSeconds(2.5f);   // passa a intro
+        yield return new WaitForSeconds(BossIntroState.Duracao + 0.6f);   // passa a intro
 
         Assert.AreEqual("fase1", boss.Machine.CurrentName);
 
@@ -201,7 +202,7 @@ public class MundoEProgressaoTests
         Assert.AreEqual("transicao", boss.Machine.CurrentName,
             "zerar a vida da fase 1 leva para a transição, não mata");
 
-        yield return new WaitForSeconds(2.5f);
+        yield return new WaitForSeconds(BossIntroState.Duracao + 0.6f);
         Assert.AreEqual(2, boss.FaseAtual, "deveria ter virado a fase 2");
         Assert.AreEqual(boss.healthFase2, boss.Health, "a fase nova começa com a vida dela");
     }
@@ -211,14 +212,14 @@ public class MundoEProgressaoTests
     {
         var boss = CriarChefe(new Vector2(20f, 5f));
         yield return null;
-        yield return new WaitForSeconds(2.5f);
+        yield return new WaitForSeconds(BossIntroState.Duracao + 0.6f);
 
         boss.TakeDamage(boss.healthFase1, Vector2.zero);
-        yield return new WaitForSeconds(2.5f);
+        yield return new WaitForSeconds(BossIntroState.Duracao + 0.6f);
         Assert.IsFalse(boss.Derrotado, "não pode morrer na fase 1");
 
         boss.TakeDamage(boss.healthFase2, Vector2.zero);
-        yield return new WaitForSeconds(2.5f);
+        yield return new WaitForSeconds(BossIntroState.Duracao + 0.6f);
         Assert.IsFalse(boss.Derrotado, "não pode morrer na fase 2");
         Assert.AreEqual(3, boss.FaseAtual);
 

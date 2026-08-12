@@ -13,10 +13,11 @@ public class CombateTests
     [SetUp]
     public void Antes()
     {
-        // Um teste de pausa, morte ou vitória congela o tempo. Se ele
-        // vazar para cá, a física não avança e nada assenta no chão —
-        // as falhas aparecem em testes que não têm nada a ver.
-        Time.timeScale = 1f;
+        // Ambiente limpo: tempo normal, camadas configuradas e sem restos
+        // de cena de outro teste. Sem isso, um teste que congela o tempo ou
+        // que abre uma região de verdade derruba os seguintes com erros que
+        // não têm nada a ver com a causa.
+        CenarioDeTeste.PrepararAmbiente();
 
         Physics2D.IgnoreLayerCollision(CenarioDeTeste.LayerPlayer, CenarioDeTeste.LayerEnemy, true);
         CenarioDeTeste.CriarSistemas();
@@ -169,7 +170,13 @@ public class CombateTests
         kaida.DoAttackHit();
         yield return null;
 
+        Assert.IsFalse(alvo == null,
+            $"um único golpe de {kaida.stats.attackDamage} matou um inimigo com " +
+            $"{vidaAntes} de vida: o dano está sendo aplicado mais de uma vez");
+
         Assert.Less(alvo.Health, vidaAntes, "o inimigo à frente deveria ter levado o golpe");
+        Assert.AreEqual(vidaAntes - kaida.stats.attackDamage, alvo.Health,
+            "o golpe deve tirar exatamente o dano de ataque, nem mais");
     }
 
     [UnityTest]

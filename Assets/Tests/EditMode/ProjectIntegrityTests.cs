@@ -298,22 +298,29 @@ public class ProjectIntegrityTests
         var raizes = cena.GetRootGameObjects();
 
         var boss = raizes.Select(r => r.GetComponentInChildren<GuardianBoss>()).FirstOrDefault(b => b != null);
-        var tilemap = raizes.Select(r => r.GetComponentInChildren<Tilemap>()).FirstOrDefault(t => t != null);
         Assert.IsNotNull(boss);
-        Assert.IsNotNull(tilemap);
+
+        // Todos os tilemaps de chão, não só o primeiro: as plataformas ficam
+        // numa camada separada da do piso, por serem atravessáveis por baixo.
+        var mapas = raizes.SelectMany(r => r.GetComponentsInChildren<Tilemap>())
+                          .Where(t => t.gameObject.layer == PrefabBuilder.LayerGround)
+                          .ToList();
+        Assert.Greater(mapas.Count, 0, "nenhum tilemap de chão na arena");
 
         float alturaDoChefe = boss.transform.position.y;
 
         // procura a plataforma mais alta abaixo do chefe, num raio horizontal razoável
         float melhorPlataforma = float.MinValue;
-        var limites = tilemap.cellBounds;
-        foreach (var pos in limites.allPositionsWithin)
+        foreach (var tilemap in mapas)
         {
-            if (tilemap.GetTile(pos) == null) continue;
-            var mundo = tilemap.GetCellCenterWorld(pos);
-            if (Mathf.Abs(mundo.x - boss.transform.position.x) > 22f) continue;
-            if (mundo.y >= alturaDoChefe) continue;
-            melhorPlataforma = Mathf.Max(melhorPlataforma, mundo.y);
+            foreach (var pos in tilemap.cellBounds.allPositionsWithin)
+            {
+                if (tilemap.GetTile(pos) == null) continue;
+                var mundo = tilemap.GetCellCenterWorld(pos);
+                if (Mathf.Abs(mundo.x - boss.transform.position.x) > 22f) continue;
+                if (mundo.y >= alturaDoChefe) continue;
+                melhorPlataforma = Mathf.Max(melhorPlataforma, mundo.y);
+            }
         }
 
         Assert.Greater(melhorPlataforma, float.MinValue, "não há plataforma nenhuma sob o chefe");

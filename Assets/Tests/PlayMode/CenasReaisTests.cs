@@ -20,6 +20,12 @@ using UnityEngine.TestTools;
 /// </summary>
 public class CenasReaisTests
 {
+    [TearDown]
+    public void Depois()
+    {
+        Time.timeScale = 1f;
+        CenarioDeTeste.Limpar();
+    }
     static readonly string[] Regioes =
     {
         "01_OrlaDaVila",
