@@ -15,7 +15,7 @@ public class MainMenu : MonoBehaviour
 
     GameObject painelPrincipal, painelDificuldade, painelControles, painelVideo;
     Button botaoContinuar;
-    Text rotuloDificuldade, descricaoDificuldade, rotuloTela, rotuloVolume;
+    Text rotuloDificuldade, rotuloTela, rotuloVolume;
 
     void Start()
     {
@@ -36,8 +36,17 @@ public class MainMenu : MonoBehaviour
     }
 
     // ------------------------------------------------------------------ ações
-    void NovoJogo()
+    /// <summary>
+    /// Começar uma partida passa pela escolha da dificuldade. Ela vale para a
+    /// partida inteira, então perguntar aqui é mais honesto do que deixar a
+    /// opção escondida num submenu que o jogador pode nem abrir.
+    /// </summary>
+    void NovoJogo() => Trocar(Aba.Dificuldade);
+
+    void ComecarPartida(Dificuldade d)
     {
+        GameSettings.Atual = d;
+
         // começar do zero significa apagar o progresso antigo de verdade
         if (SaveSystem.Instance != null) SaveSystem.Instance.DeleteSave();
         else DeletarSaveSemInstancia();
@@ -60,12 +69,6 @@ public class MainMenu : MonoBehaviour
 #endif
     }
 
-    void EscolherDificuldade(Dificuldade d)
-    {
-        GameSettings.Atual = d;
-        AtualizarDificuldade();
-    }
-
     // ----------------------------------------------------------------- estado
     void AtualizarContinuar()
     {
@@ -83,9 +86,8 @@ public class MainMenu : MonoBehaviour
 
     void AtualizarDificuldade()
     {
-        var d = GameSettings.Atual;
-        if (rotuloDificuldade != null) rotuloDificuldade.text = $"Dificuldade: {GameSettings.Nome(d)}";
-        if (descricaoDificuldade != null) descricaoDificuldade.text = GameSettings.Descricao(d);
+        if (rotuloDificuldade != null)
+            rotuloDificuldade.text = $"Última dificuldade usada: {GameSettings.Nome(GameSettings.Atual)}";
     }
 
     static void DeletarSaveSemInstancia()
@@ -125,7 +127,7 @@ public class MainMenu : MonoBehaviour
         string modo = Screen.fullScreen ? "tela cheia" : "janela";
         float proporcao = (float)Screen.width / Mathf.Max(1, Screen.height);
         rotuloTela.text = $"Agora: {Screen.width} x {Screen.height}  ({modo})\n" +
-                          $"Proporção {proporcao:0.00} — a interface se ajusta sozinha";
+                          $"Proporção {proporcao:0.00} - a interface se ajusta sozinha";
     }
 
     // -------------------------------------------------------------- interface
@@ -226,34 +228,42 @@ public class MainMenu : MonoBehaviour
         UIKit.Titulo(t, "KAIDA", 44, new Vector2(ColunaX, 134f));
         UIKit.Subtitulo(t, "Raízes do Esquecimento", new Vector2(ColunaX, 104f), 15);
 
+        // Seis opções, não sete: com a coluna começando em 74 cada botão come
+        // 37 de altura, e a sétima passava por baixo do rótulo da dificuldade.
         var coluna = UIKit.Coluna(t, new Vector2(ColunaX, 74f), 230f, 7f);
         UIKit.Botao(coluna, "Novo jogo", NovoJogo);
         botaoContinuar = UIKit.Botao(coluna, "Continuar", Continuar);
-        UIKit.Botao(coluna, "Dificuldade", () => Trocar(Aba.Dificuldade));
         UIKit.Botao(coluna, "Controles", () => Trocar(Aba.Controles));
         UIKit.Botao(coluna, "Tela e som", () => Trocar(Aba.Video));
         UIKit.Botao(coluna, "Créditos", AbrirCreditos);
         UIKit.Botao(coluna, "Sair", Sair);
 
-        rotuloDificuldade = UIKit.Subtitulo(t, "", new Vector2(ColunaX, -152f), 12);
+        rotuloDificuldade = UIKit.Subtitulo(t, "", new Vector2(ColunaX, -156f), 12);
     }
 
     void MontarDificuldade()
     {
         var t = painelDificuldade.transform;
-        UIKit.Titulo(t, "DIFICULDADE", 28, new Vector2(ColunaX, 116f));
+        UIKit.Titulo(t, "DIFICULDADE", 26, new Vector2(ColunaX, 128f));
+        UIKit.Subtitulo(t, "Vale para a partida inteira", new Vector2(ColunaX, 104f), 12);
 
         var coluna = UIKit.Coluna(t, new Vector2(ColunaX, 78f), 230f, 9f);
-        UIKit.Botao(coluna, "Fácil", () => EscolherDificuldade(Dificuldade.Facil));
-        UIKit.Botao(coluna, "Normal", () => EscolherDificuldade(Dificuldade.Normal));
-        UIKit.Botao(coluna, "Difícil", () => EscolherDificuldade(Dificuldade.Dificil));
+        UIKit.Botao(coluna, "Fácil", () => ComecarPartida(Dificuldade.Facil));
+        UIKit.Botao(coluna, "Normal", () => ComecarPartida(Dificuldade.Normal));
+        UIKit.Botao(coluna, "Difícil", () => ComecarPartida(Dificuldade.Dificil));
 
-        descricaoDificuldade = UIKit.Paragrafo(t, "", new Vector2(ColunaX, -60f), new Vector2(300f, 70f));
+        // As três descrições ficam à vista de uma vez: como o clique já começa
+        // a partida, não sobra momento para o jogador ler uma de cada vez.
+        UIKit.Paragrafo(t,
+            "Fácil - 7 de vida e recuperação longa.\n" +
+            "Normal - o jogo como foi balanceado.\n" +
+            "Difícil - 3 de vida e inimigos mais atentos.",
+            new Vector2(ColunaX, -48f), new Vector2(310f, 60f), 12);
 
-        var voltar = UIKit.Coluna(t, new Vector2(ColunaX, -118f), 180f, 8f);
+        var voltar = UIKit.Coluna(t, new Vector2(ColunaX, -104f), 180f, 8f);
         UIKit.Botao(voltar, "Voltar", () => Trocar(Aba.Principal));
 
-        UIKit.Rodape(t, "A dificuldade vale para a próxima partida");
+        UIKit.Rodape(t, "Escolher já começa a partida", ColunaX);
     }
 
     void MontarControles()

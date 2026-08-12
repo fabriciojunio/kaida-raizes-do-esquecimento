@@ -7,7 +7,7 @@ using UnityEngine.UI;
 /// escuro, texto cor de osso, destaque cor de lúmen.
 ///
 /// Os menus são construídos assim, e não como prefabs, para que qualquer
-/// cena funcione sozinha — inclusive as cenas de teste, que não têm UI
+/// cena funcione sozinha - inclusive as cenas de teste, que não têm UI
 /// montada à mão.
 /// </summary>
 public static class UIKit
@@ -163,7 +163,12 @@ public static class UIKit
         return b;
     }
 
-    public static Text Rodape(Transform pai, string texto)
+    /// <summary>
+    /// Linha de apoio colada na base da tela. O deslocamento horizontal existe
+    /// porque o menu principal fica à esquerda: centralizado, o rodapé ficava
+    /// solto no meio do cenário, longe do que ele explica.
+    /// </summary>
+    public static Text Rodape(Transform pai, string texto, float deslocamentoX = 0f)
     {
         var go = new GameObject("Rodape", typeof(RectTransform));
         go.transform.SetParent(pai, false);
@@ -179,8 +184,8 @@ public static class UIKit
         rt.anchorMin = new Vector2(0.5f, 0f);
         rt.anchorMax = new Vector2(0.5f, 0f);
         rt.pivot = new Vector2(0.5f, 0f);
-        rt.anchoredPosition = new Vector2(0f, 14f);
-        rt.sizeDelta = new Vector2(560f, 18f);
+        rt.anchoredPosition = new Vector2(deslocamentoX, 14f);
+        rt.sizeDelta = new Vector2(300f, 18f);
         return t;
     }
 
