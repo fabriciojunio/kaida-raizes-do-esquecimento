@@ -2,7 +2,7 @@ using UnityEngine;
 
 /// <summary>
 /// Fim do confronto. O Guardião se desfaz e o lúmen que ele guardava se
-/// solta — o jogo não diz se Kaida o deteve ou se lembrou de si mesma
+/// solta - o jogo não diz se Kaida o deteve ou se lembrou de si mesma
 /// através dele. Fica em aberto, como no GDD.
 /// </summary>
 public class BossDeadState : State

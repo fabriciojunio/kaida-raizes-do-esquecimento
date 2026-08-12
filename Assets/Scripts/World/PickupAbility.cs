@@ -2,7 +2,7 @@ using UnityEngine;
 
 /// <summary>
 /// Habilidade largada no mundo (Pulo Duplo no fim da Floresta, Escalada de
-/// Parede no fim da Caverna). Some para sempre depois de pego — o save guarda
+/// Parede no fim da Caverna). Some para sempre depois de pego - o save guarda
 /// tanto a habilidade quanto o item, para não reaparecer ao voltar na sala.
 /// </summary>
 [RequireComponent(typeof(Collider2D))]

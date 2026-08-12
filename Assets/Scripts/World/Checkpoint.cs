@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// Marco de descanso. Grava a posição no GameManager e salva o progresso —
+/// Marco de descanso. Grava a posição no GameManager e salva o progresso -
 /// morrer devolve Kaida ao último marco tocado, não ao começo da região.
 /// </summary>
 [RequireComponent(typeof(Collider2D))]

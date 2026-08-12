@@ -78,7 +78,7 @@ public static class SpriteSheetSetup
 
         // Fundos são desenhados lado a lado (SpriteDrawMode.Tiled). Com o mesh
         // "Tight", que é o padrão, a Unity recorta o contorno do desenho e a
-        // repetição fica com falhas — aparecem faixas claras entre as cópias.
+        // repetição fica com falhas - aparecem faixas claras entre as cópias.
         var settings = new TextureImporterSettings();
         imp.ReadTextureSettings(settings);
         settings.spriteMeshType = SpriteMeshType.FullRect;
@@ -215,7 +215,7 @@ public static class SpriteSheetSetup
     ///
     /// Só a faixa central de cada frame é examinada. Olhando a folha inteira,
     /// o pixel mais baixo da animação de ataque é a ponta da espada, que
-    /// desce abaixo dos pés — o pivô saía 0,15 mais baixo que o do idle e a
+    /// desce abaixo dos pés - o pivô saía 0,15 mais baixo que o do idle e a
     /// personagem dava um pulo para cima toda vez que atacava.
     /// </summary>
     static Vector2 CalcularPivo(Texture2D tex, int larguraFrame)
@@ -230,7 +230,7 @@ public static class SpriteSheetSetup
         // da folha saía 0,15 mais baixo que o do idle. Resultado: a
         // personagem subia meia unidade toda vez que atacava.
         //
-        // O primeiro frame é sempre a pose de partida, com os pés apoiados —
+        // O primeiro frame é sempre a pose de partida, com os pés apoiados -
         // e nas folhas deste pacote os pés ficam na mesma linha em todas as
         // animações de mesma altura de canvas.
         var colunasDoCorpo = new System.Collections.Generic.List<int>();

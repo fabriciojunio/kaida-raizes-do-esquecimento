@@ -4,7 +4,7 @@ using UnityEngine;
 /// Javali-Casca (Orla da Vila / Floresta Silente).
 /// Morador do vale corrompido pelo Esquecimento: anda devagar, mas ao avistar
 /// Kaida ele recua, telegrafa e dispara numa investida reta. Ensina o padrão
-/// central do jogo — "leia o aviso, desvie, ataque na abertura".
+/// central do jogo - "leia o aviso, desvie, ataque na abertura".
 /// </summary>
 public class BoarEnemy : EnemyController
 {
@@ -91,7 +91,7 @@ public class BoarEnemy : EnemyController
         if (phaseTimer <= 0f) phase = Phase.Rondando;
     }
 
-    /// <summary>Levar dano durante a investida interrompe o ataque — é a recompensa por acertar a janela.</summary>
+    /// <summary>Levar dano durante a investida interrompe o ataque - é a recompensa por acertar a janela.</summary>
     public override void TakeDamage(int amount, Vector2 sourcePos)
     {
         base.TakeDamage(amount, sourcePos);

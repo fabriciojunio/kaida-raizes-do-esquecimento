@@ -2,7 +2,7 @@ using UnityEngine;
 
 /// <summary>
 /// Monta um cenário mínimo de verdade para os testes de PlayMode: chão com
-/// collider, Kaida com Rigidbody e a física rodando. Nada é simulado — o que
+/// collider, Kaida com Rigidbody e a física rodando. Nada é simulado - o que
 /// os testes medem é o mesmo comportamento que aparece no jogo.
 /// </summary>
 public static class CenarioDeTeste

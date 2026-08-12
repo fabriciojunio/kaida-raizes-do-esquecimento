@@ -2,7 +2,7 @@ using UnityEngine;
 
 /// <summary>
 /// A Kaida do fundo do menu: anda de um lado para o outro sozinha, para e
-/// olha em volta, e volta a andar. Não tem física nem controle — é só
+/// olha em volta, e volta a andar. Não tem física nem controle - é só
 /// aparência, e por isso não usa o PlayerController.
 /// </summary>
 public class KaidaDeVitrine : MonoBehaviour

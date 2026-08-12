@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.TestTools;
 
 /// <summary>
-/// Dificuldade, pausa, morte e vitória — as partes que ficam em volta do
+/// Dificuldade, pausa, morte e vitória - as partes que ficam em volta do
 /// jogo em si, mas sem as quais ele não é entregável.
 /// </summary>
 public class MenusEDificuldadeTests

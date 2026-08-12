@@ -9,13 +9,13 @@ using UnityEngine.TestTools;
 /// Carrega as cenas de verdade e deixa a física rodar.
 ///
 /// É o teste que pega o erro mais grave possível neste projeto: chão sem
-/// colisão. Ele não aparece em captura de tela nenhuma — o cenário fica
+/// colisão. Ele não aparece em captura de tela nenhuma - o cenário fica
 /// perfeito e a Kaida simplesmente atravessa o mundo no primeiro segundo.
 /// Já aconteceu duas vezes durante o desenvolvimento.
 ///
 /// As regiões são percorridas dentro de cada teste, num laço, em vez de
 /// virarem casos separados: [UnityTest] não aceita [TestCase] nem
-/// [ValueSource] — a combinação compila, o teste simplesmente não roda,
+/// [ValueSource] - a combinação compila, o teste simplesmente não roda,
 /// e some da contagem sem avisar.
 /// </summary>
 public class CenasReaisTests
@@ -58,7 +58,7 @@ public class CenasReaisTests
             float queda = alturaInicial - kaida.transform.position.y;
 
             if (queda > 6f)
-                falhas.Add($"{regiao}: caiu {queda:F1} unidades — o chão não tem colisão");
+                falhas.Add($"{regiao}: caiu {queda:F1} unidades - o chão não tem colisão");
             else if (!kaida.IsGrounded())
                 falhas.Add($"{regiao}: não encontrou chão embaixo dela");
         }

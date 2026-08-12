@@ -1,6 +1,6 @@
 using UnityEngine;
 
-/// <summary>Subida do pulo — pulo variável (soltar corta a subida).</summary>
+/// <summary>Subida do pulo - pulo variável (soltar corta a subida).</summary>
 public class PlayerJumpState : State
 {
     PlayerController p;

@@ -2,7 +2,7 @@ using UnityEngine;
 
 /// <summary>
 /// Fragmento de Lúmen: colecionável narrativo, opcional. Não muda a
-/// jogabilidade — é onde a história de Kaida e do vale aparece, aos pedaços,
+/// jogabilidade - é onde a história de Kaida e do vale aparece, aos pedaços,
 /// para quem sair da rota principal.
 /// </summary>
 [RequireComponent(typeof(Collider2D))]

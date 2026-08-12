@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// Fase 3 — corpo a corpo. Ele desce e persegue Kaida em investidas rápidas,
+/// Fase 3 - corpo a corpo. Ele desce e persegue Kaida em investidas rápidas,
 /// alternando com feixes curtos para fechar as rotas de fuga. É onde dash,
 /// pulo duplo e parede precisam ser usados juntos para não ser encurralada.
 /// </summary>

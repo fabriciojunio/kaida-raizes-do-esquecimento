@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 /// <summary>
 /// HUD de vida em "pips". Se não receber um container montado no Inspector,
-/// cria o próprio canvas por código — assim qualquer cena mostra a vida sem
+/// cria o próprio canvas por código - assim qualquer cena mostra a vida sem
 /// depender de prefab de UI.
 /// Reage a HealthChanged e reconstrói os pips quando a vida máxima cresce
 /// (Nódulos de Vida aumentam o total durante a partida).

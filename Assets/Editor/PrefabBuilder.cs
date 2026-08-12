@@ -8,7 +8,7 @@ using UnityEngine;
 /// os objetos de mundo (checkpoint, habilidade, fragmento, nódulo).
 ///
 /// Escala: 16 pixels por unidade, então 1 tile = 1 unidade. Nessa medida
-/// Kaida tem 3 unidades de altura e o javali 2,5 de largura — as proporções
+/// Kaida tem 3 unidades de altura e o javali 2,5 de largura - as proporções
 /// vêm do próprio pacote de arte, não são arbitrárias.
 /// </summary>
 public static class PrefabBuilder
@@ -293,7 +293,7 @@ public static class PrefabBuilder
         //
         // Como corpo dinâmico, ele pousava em cima das plataformas da arena.
         // A física zerava a velocidade vertical e o Guardião passava a luta
-        // inteira empoleirado, alto demais para o golpe corpo a corpo — o
+        // inteira empoleirado, alto demais para o golpe corpo a corpo - o
         // confronto simplesmente não tinha saída.
         var rb = go.AddComponent<Rigidbody2D>();
         rb.bodyType = RigidbodyType2D.Kinematic;

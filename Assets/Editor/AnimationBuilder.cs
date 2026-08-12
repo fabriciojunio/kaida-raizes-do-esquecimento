@@ -10,7 +10,7 @@ using UnityEngine;
 ///
 /// Os nomes dos estados batem com o que o código chama em PlayAnim():
 /// idle, run, jump, fall, dash, attack, hurt, death, wallcling.
-/// Mudar um nome aqui quebra a animação em jogo — o Animator falha em
+/// Mudar um nome aqui quebra a animação em jogo - o Animator falha em
 /// silêncio quando o estado não existe.
 /// </summary>
 public static class AnimationBuilder

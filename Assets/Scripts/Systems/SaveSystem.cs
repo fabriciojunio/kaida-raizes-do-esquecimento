@@ -3,7 +3,7 @@ using UnityEngine;
 
 /// <summary>
 /// Save simples em JSON (PlayerPrefs para o caminho do arquivo seria outra
-/// opção). Guarda checkpoint, habilidades desbloqueadas e itens coletados —
+/// opção). Guarda checkpoint, habilidades desbloqueadas e itens coletados -
 /// base para um metroidvania com progressão.
 /// </summary>
 [System.Serializable]

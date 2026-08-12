@@ -42,7 +42,7 @@ public class BossHealthUI : MonoBehaviour
 
     void AoMudarFase(int fase)
     {
-        if (rotulo != null) rotulo.text = $"O Guardião do Lúmen  —  fase {fase} de 3";
+        if (rotulo != null) rotulo.text = $"O Guardião do Lúmen  -  fase {fase} de 3";
     }
 
     void AoMorrer()

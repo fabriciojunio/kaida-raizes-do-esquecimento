@@ -39,7 +39,7 @@ public static class KaidaBuild
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
-            Log("PRONTO — jogo montado.");
+            Log("PRONTO - jogo montado.");
         }
         catch (Exception e)
         {
@@ -55,12 +55,12 @@ public static class KaidaBuild
     /// </summary>
     public static void ConfigurarProjeto()
     {
-        // O jogador não deve ser empurrado pelo corpo dos inimigos — o dano de
+        // O jogador não deve ser empurrado pelo corpo dos inimigos - o dano de
         // contato é resolvido por overlap, não por colisão física.
         Physics2D.IgnoreLayerCollision(PrefabBuilder.LayerPlayer, PrefabBuilder.LayerEnemy, true);
         Physics2D.IgnoreLayerCollision(PrefabBuilder.LayerEnemy, PrefabBuilder.LayerEnemy, true);
 
-        // O colisor do chefe é um gatilho — ele voa e não pode esbarrar no
+        // O colisor do chefe é um gatilho - ele voa e não pode esbarrar no
         // cenário. Sem isto, o golpe da Kaida não o encontraria.
         Physics2D.queriesHitTriggers = true;
 
@@ -73,7 +73,7 @@ public static class KaidaBuild
 
         // O jogo pode ser aberto em qualquer tela: monitor ultrawide, notebook
         // ou projetor de sala de aula. "Fullscreen Window" assume a resolução
-        // nativa de quem estiver rodando, sem trocar o modo do monitor — é o
+        // nativa de quem estiver rodando, sem trocar o modo do monitor - é o
         // que não quebra em projetor. A janela também pode ser redimensionada.
         PlayerSettings.fullScreenMode = FullScreenMode.FullScreenWindow;
         PlayerSettings.defaultIsNativeResolution = true;
@@ -93,7 +93,7 @@ public static class KaidaBuild
         var cenas = EditorBuildSettings.scenes;
         if (cenas.Length == 0)
         {
-            Debug.LogError("[Kaida] Nenhuma cena em Build Settings — rode 'MONTAR TUDO' antes.");
+            Debug.LogError("[Kaida] Nenhuma cena em Build Settings - rode 'MONTAR TUDO' antes.");
             if (Application.isBatchMode) EditorApplication.Exit(1);
             return;
         }

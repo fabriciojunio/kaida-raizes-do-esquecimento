@@ -3,11 +3,11 @@
 Todo o código deste repositório é do projeto. **A arte não**: vem de pacotes
 de terceiros. Esta página registra a origem de cada peça.
 
-## Legacy Fantasy — High Forest
+## Legacy Fantasy - High Forest
 
 - **Autor:** Anokolisa
 - **Página:** https://anokolisa.itch.io/sidescroller-pixelart-sprites-asset-pack-forest-16x16
-- **Licença:** gratuito, uso comercial permitido. O autor não cobra nada —
+- **Licença:** gratuito, uso comercial permitido. O autor não cobra nada -
   pede apenas uma avaliação honesta na página do pacote.
 - **Tile:** 16x16 pixels
 
@@ -15,7 +15,7 @@ de terceiros. Esta página registra a origem de cada peça.
 
 | No jogo | De onde vem |
 |---------|-------------|
-| Kaida (protagonista) | `Character/` — Idle, Run, Jump-Start, Jump-All, Jump-End, Attack-01, Dead |
+| Kaida (protagonista) | `Character/` - Idle, Run, Jump-Start, Jump-All, Jump-End, Attack-01, Dead |
 | Javali-Casca | `Mob/Boar/` |
 | Abelha-Eco | `Mob/Small Bee/` |
 | Caracol-Rastejante | `Mob/Snail/` |
@@ -36,7 +36,7 @@ Fundos usados na Caverna Musgosa e no Santuário Esquecido
 escala do resto.
 
 Confirme a licença na página de origem antes de publicar o jogo fora da
-faculdade — o pacote não veio com arquivo de licença.
+faculdade - o pacote não veio com arquivo de licença.
 
 ## Música
 
@@ -49,7 +49,7 @@ diferentes por região.
 
 | Pacote | Motivo |
 |--------|--------|
-| Mossy Assets | Não é pixel art na mesma escala — as folhas têm 4096x4096 contra tiles de 16x16. Misturar quebraria a coerência visual. |
+| Mossy Assets | Não é pixel art na mesma escala - as folhas têm 4096x4096 contra tiles de 16x16. Misturar quebraria a coerência visual. |
 | BlueWizard Animations | Mesma questão de escala e estilo. |
 | Plant Animations | Idem. |
 | Slimes | Idem. |

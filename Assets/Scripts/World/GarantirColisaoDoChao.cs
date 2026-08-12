@@ -6,7 +6,7 @@ using UnityEngine.Tilemaps;
 ///
 /// A forma do CompositeCollider2D não é totalmente confiável quando vem
 /// serializada: dependendo da ordem em que a cena foi montada, ela pode
-/// chegar vazia. E chão sem colisão é o pior defeito possível aqui — o
+/// chegar vazia. E chão sem colisão é o pior defeito possível aqui - o
 /// cenário aparece perfeito e o jogador atravessa o mundo no primeiro
 /// segundo, sem nenhuma pista do que houve.
 ///

@@ -83,22 +83,22 @@ as contribuições de cada integrante. Uma divisão que cabe no tempo:
 | Demonstração | 5 min | Jogar do menu até o chefe, mostrando as habilidades |
 | Código | 6 min | Cada integrante mostra a sua frente |
 | Fechamento | 2 min | Testes, dificuldades encontradas e o que aprenderam |
-| Perguntas | 1 min | — |
+| Perguntas | 1 min | - |
 
 ### Pontos fortes que vale destacar no código
 
-1. **Máquina de estados do jogador** — mostra separação de
+1. **Máquina de estados do jogador** - mostra separação de
    responsabilidades: cada estado num arquivo, sem condicionais aninhadas.
 
-2. **Cenas geradas a partir de mapas em texto** — mostrar
+2. **Cenas geradas a partir de mapas em texto** - mostrar
    `SceneBuilder.cs`, editar um mapa ao vivo e regenerar a região é uma
    demonstração forte.
 
-3. **Trilha gerada por síntese** — nenhum pacote trazia áudio, e em vez de
+3. **Trilha gerada por síntese** - nenhum pacote trazia áudio, e em vez de
    deixar o jogo mudo a música é construída por código, com escala menor e
    tônica diferente por região.
 
-4. **Testes que nasceram de bug real** — o validador de alcance dos mapas
+4. **Testes que nasceram de bug real** - o validador de alcance dos mapas
    reprovou as cinco regiões da primeira versão, e o teste de colisão do
    chão pegou um defeito que deixava a personagem atravessar o cenário sem
    que nada aparecesse na tela.

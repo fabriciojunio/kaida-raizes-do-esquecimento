@@ -3,7 +3,7 @@ using UnityEngine;
 /// <summary>
 /// Inimigo base: patrulha, detecta o jogador, persegue e ataca por contato.
 /// Serve de base para inimigos mais específicos (voadores, atiradores, etc.)
-/// via herança — os métodos de comportamento são virtuais de propósito.
+/// via herança - os métodos de comportamento são virtuais de propósito.
 /// </summary>
 [RequireComponent(typeof(Rigidbody2D))]
 public class EnemyController : MonoBehaviour, IDamageable

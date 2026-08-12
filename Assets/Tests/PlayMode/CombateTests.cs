@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.TestTools;
 
 /// <summary>
-/// Combate, dano, morte e respawn — com colisores e física reais.
+/// Combate, dano, morte e respawn - com colisores e física reais.
 /// </summary>
 public class CombateTests
 {

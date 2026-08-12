@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 /// <summary>
 /// Caixa de texto que aparece ao pegar habilidades e fragmentos de lore.
-/// Se ninguém montou a UI na cena, ela se monta sozinha — assim um coletável
+/// Se ninguém montou a UI na cena, ela se monta sozinha - assim um coletável
 /// numa cena de teste funciona sem depender de prefab.
 /// </summary>
 public class MessageUI : MonoBehaviour

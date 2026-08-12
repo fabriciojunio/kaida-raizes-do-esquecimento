@@ -1,6 +1,6 @@
 using UnityEngine;
 
-/// <summary>Queda — com coyote time e jump buffering.</summary>
+/// <summary>Queda - com coyote time e jump buffering.</summary>
 public class PlayerFallState : State
 {
     PlayerController p;

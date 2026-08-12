@@ -2,7 +2,7 @@ using UnityEngine;
 
 /// <summary>
 /// Feixe de memória disparado pelo Guardião. Anda reto, some ao bater no
-/// cenário ou depois de um tempo — projétil não pode ficar vivo para sempre.
+/// cenário ou depois de um tempo - projétil não pode ficar vivo para sempre.
 /// </summary>
 [RequireComponent(typeof(Collider2D))]
 public class LumenBeam : MonoBehaviour

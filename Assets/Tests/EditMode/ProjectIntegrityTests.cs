@@ -362,7 +362,7 @@ public class ProjectIntegrityTests
         var tilemap = raizes.Select(r => r.GetComponentInChildren<Tilemap>())
                             .FirstOrDefault(t => t != null);
         Assert.IsNotNull(tilemap, "a cena não tem tilemap");
-        Assert.Greater(tilemap.GetUsedTilesCount(), 0, "o tilemap está vazio — sem chão não dá para jogar");
+        Assert.Greater(tilemap.GetUsedTilesCount(), 0, "o tilemap está vazio - sem chão não dá para jogar");
 
         var colisor = tilemap.GetComponent<TilemapCollider2D>();
         Assert.IsNotNull(colisor, "o chão não tem collider: a Kaida cairia para sempre");
@@ -521,7 +521,7 @@ public class ProjectIntegrityTests
 
         var tamanho = sr.sprite.bounds.size * prefab.transform.localScale.y;
         Assert.LessOrEqual(tamanho.y, alturaMaxima,
-            $"{caminho} usa um sprite de {tamanho.y:F1} unidades de altura — " +
+            $"{caminho} usa um sprite de {tamanho.y:F1} unidades de altura - " +
             "parece a folha inteira em vez de uma peça recortada");
         Assert.LessOrEqual(tamanho.x, alturaMaxima + 1f,
             $"{caminho} tem {tamanho.x:F1} unidades de largura");

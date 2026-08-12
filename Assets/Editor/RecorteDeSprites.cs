@@ -6,7 +6,7 @@ using UnityEngine;
 /// próprio: itens, vegetação e construções.
 ///
 /// Existe porque usar a folha inteira como sprite de um objeto coloca no
-/// mundo uma imagem de dezenas de unidades — a tela fica coberta de pedras e
+/// mundo uma imagem de dezenas de unidades - a tela fica coberta de pedras e
 /// runas soltas. Cada peça precisa da sua janela, medida nos pixels.
 /// </summary>
 public static class RecorteDeSprites

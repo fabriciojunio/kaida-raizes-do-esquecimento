@@ -6,7 +6,7 @@ using UnityEngine.UI;
 ///
 /// A câmera da cena renderiza para uma textura em vez da tela; essa textura
 /// é desenhada num RawImage com o shader de desfoque. Assim o fundo continua
-/// vivo — a Kaida anda, as folhas se mexem — mas sem competir com o texto.
+/// vivo - a Kaida anda, as folhas se mexem - mas sem competir com o texto.
 ///
 /// Se o shader não estiver disponível por qualquer motivo, cai para um véu
 /// escuro simples: o menu continua legível.

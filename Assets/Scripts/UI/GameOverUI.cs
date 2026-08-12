@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 /// <summary>
 /// Tela de morte. Assume o controle do respawn: enquanto ela existe na cena,
-/// o GameManager não devolve o jogador sozinho — quem decide é quem está
+/// o GameManager não devolve o jogador sozinho - quem decide é quem está
 /// jogando.
 /// </summary>
 public class GameOverUI : MonoBehaviour

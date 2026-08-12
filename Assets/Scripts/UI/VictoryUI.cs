@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 /// <summary>
 /// Fim de jogo. Aparece quando o Guardião cai, com o balanço do que Kaida
-/// juntou pelo caminho — os fragmentos são opcionais, então o número diz
+/// juntou pelo caminho - os fragmentos são opcionais, então o número diz
 /// quanto da história o jogador viu.
 /// </summary>
 public class VictoryUI : MonoBehaviour

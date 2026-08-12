@@ -5,7 +5,7 @@ using UnityEngine;
 /// vitória).
 ///
 /// O cursor precisa aparecer sempre que houver uma delas na frente, e sumir
-/// assim que todas fecharem. Antes disso, só a pausa era considerada — e o
+/// assim que todas fecharem. Antes disso, só a pausa era considerada - e o
 /// ponteiro voltava a sumir bem na hora de clicar em "voltar ao marco" na
 /// tela de morte.
 /// </summary>

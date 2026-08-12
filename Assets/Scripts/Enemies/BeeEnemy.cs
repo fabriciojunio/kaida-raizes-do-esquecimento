@@ -3,7 +3,7 @@ using UnityEngine;
 /// <summary>
 /// Abelha-Eco (Caverna Musgosa). Voadora: ignora gravidade, patrulha numa
 /// onda senoidal e mergulha em diagonal sobre Kaida. Obriga o jogador a olhar
-/// para cima, não só para os lados — o conceito novo da Caverna.
+/// para cima, não só para os lados - o conceito novo da Caverna.
 /// </summary>
 public class BeeEnemy : EnemyController
 {
@@ -19,7 +19,7 @@ public class BeeEnemy : EnemyController
 
     [Header("Janela de contra-ataque")]
     [Tooltip("Tempo pairando na altura do jogador depois do mergulho. É a " +
-             "janela em que dá para revidar — sem ela a abelha volta para o " +
+             "janela em que dá para revidar - sem ela a abelha volta para o " +
              "alto e o ataque corpo a corpo nunca alcança.")]
     public float tempoPairando = 1.1f;
 

@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// Fase 1 — feixes de memória. O Guardião flutua devagar e dispara salvas
+/// Fase 1 - feixes de memória. O Guardião flutua devagar e dispara salvas
 /// em leque na direção de Kaida. Cobra o dash: dá para atravessar a salva
 /// na janela de invulnerabilidade.
 /// </summary>

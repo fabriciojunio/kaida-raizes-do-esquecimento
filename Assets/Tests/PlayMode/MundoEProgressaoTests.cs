@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.TestTools;
 
 /// <summary>
-/// Coletáveis, perigos, checkpoints e o chefe — a progressão do metroidvania.
+/// Coletáveis, perigos, checkpoints e o chefe - a progressão do metroidvania.
 /// </summary>
 public class MundoEProgressaoTests
 {

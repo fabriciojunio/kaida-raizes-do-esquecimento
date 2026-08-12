@@ -10,7 +10,7 @@ public enum Dificuldade
 /// <summary>
 /// Preferências que valem para a partida inteira e sobrevivem entre cenas.
 /// Guardadas em PlayerPrefs porque precisam existir antes de qualquer save
-/// de progresso — a dificuldade é escolhida na tela inicial, antes de o
+/// de progresso - a dificuldade é escolhida na tela inicial, antes de o
 /// jogador tocar no mundo.
 /// </summary>
 public static class GameSettings

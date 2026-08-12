@@ -5,7 +5,7 @@ using UnityEngine.Tilemaps;
 /// <summary>
 /// Recorta dois tiles do tileset da floresta e cria os assets de Tile.
 ///
-/// O Tiles.png do pacote não é uma grade uniforme — são peças de tamanhos
+/// O Tiles.png do pacote não é uma grade uniforme - são peças de tamanhos
 /// variados (troncos, pontes, água). Só o bloco de terra do canto superior
 /// esquerdo é grade de 16px, e é dele que saem o topo com grama e o miolo.
 /// As regiões se diferenciam pelo tint do Tilemap, não por tilesets
