@@ -47,7 +47,7 @@ public static class CapturaDeTela
             var alvo = jogador.transform.position + offset;
 
             // respeita os limites da sala, senão a captura mostra o vazio
-            // fora do mapa — que o jogador nunca chega a ver
+            // fora do mapa - que o jogador nunca chega a ver
             if (seguidor != null && seguidor.useBounds)
             {
                 float meiaAltura = cam.orthographicSize;
@@ -83,6 +83,65 @@ public static class CapturaDeTela
         rt.Release();
 
         Debug.Log($"[Kaida] capturei {nome}");
+    }
+
+    /// <summary>
+    /// Uma foto de cada região inteira, de uma borda à outra.
+    ///
+    /// A captura normal enquadra o começo da região, que é o que o jogador vê
+    /// no primeiro frame. Só que o problema de level design costuma estar do
+    /// outro lado do mapa - o poço de escalada da Caverna, por exemplo, fica
+    /// na coluna 56 e nunca aparecia em captura nenhuma.
+    /// </summary>
+    [MenuItem("Kaida/Capturar mapas inteiros", false, 42)]
+    public static void CapturarMapasInteiros()
+    {
+        Directory.CreateDirectory(Destino + "/Mapas");
+
+        foreach (var cenaBuild in EditorBuildSettings.scenes)
+        {
+            if (!cenaBuild.enabled) continue;
+            EditorSceneManager.OpenScene(cenaBuild.path, OpenSceneMode.Single);
+            string nome = Path.GetFileNameWithoutExtension(cenaBuild.path);
+
+            var cam = Object.FindObjectOfType<Camera>();
+            var seguidor = cam != null ? cam.GetComponent<CameraFollow2D>() : null;
+            if (cam == null || seguidor == null) continue;
+
+            var min = seguidor.limiteMundoMin;
+            var max = seguidor.limiteMundoMax;
+            float larguraMundo = max.x - min.x;
+            float alturaMundo = max.y - min.y;
+
+            cam.orthographicSize = alturaMundo * 0.5f;
+            cam.transform.position = new Vector3((min.x + max.x) * 0.5f,
+                                                 (min.y + max.y) * 0.5f, -10f);
+
+            int px = Mathf.RoundToInt(larguraMundo * 20f);
+            int py = Mathf.RoundToInt(alturaMundo * 20f);
+            Renderizar(cam, px, py, $"{Destino}/Mapas/{nome}.png");
+            Debug.Log($"[Kaida] mapa inteiro: {nome} ({larguraMundo:F0}x{alturaMundo:F0} unidades)");
+        }
+    }
+
+    static void Renderizar(Camera cam, int largura, int altura, string caminho)
+    {
+        var rt = new RenderTexture(largura, altura, 24);
+        cam.targetTexture = rt;
+
+        var foto = new Texture2D(largura, altura, TextureFormat.RGB24, false);
+        cam.Render();
+
+        RenderTexture.active = rt;
+        foto.ReadPixels(new Rect(0, 0, largura, altura), 0, 0);
+        foto.Apply();
+
+        cam.targetTexture = null;
+        RenderTexture.active = null;
+
+        File.WriteAllBytes(caminho, foto.EncodeToPNG());
+        Object.DestroyImmediate(foto);
+        rt.Release();
     }
 
     /// <summary>Diagnóstico em texto: escala, enquadramento e contagem de peças.</summary>

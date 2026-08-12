@@ -12,7 +12,7 @@ using UnityEngine.TestTools;
 /// A captura pela câmera (CapturaDeTela, no Editor) não pega canvas em
 /// Screen Space Overlay, então menu, pausa, HUD e tela de morte ficavam
 /// invisíveis na revisão. Aqui o jogo está de fato rodando, e a interface
-/// existe — basta pedir o frame.
+/// existe - basta pedir o frame.
 ///
 /// Além das imagens, cada método confere que a tela em questão realmente
 /// apareceu: uma captura em branco não passaria despercebida.
@@ -24,7 +24,7 @@ public class CapturaDeInterfaceTests
     /// <summary>
     /// Estas telas congelam o tempo de propósito. Sem restaurar aqui, um teste
     /// que falhasse no meio deixaria Time.timeScale em zero e derrubaria toda
-    /// a suíte seguinte — com erros que não têm relação nenhuma com a causa.
+    /// a suíte seguinte - com erros que não têm relação nenhuma com a causa.
     /// </summary>
     [TearDown]
     public void Depois()
@@ -39,7 +39,7 @@ public class CapturaDeInterfaceTests
     /// ScreenCapture não funciona em batchmode (não há tela de verdade para
     /// copiar), e a câmera sozinha não desenha canvas em Screen Space Overlay.
     /// A saída é passar os canvas temporariamente para Screen Space Camera e
-    /// renderizar a câmera numa textura — aí a interface entra no quadro.
+    /// renderizar a câmera numa textura - aí a interface entra no quadro.
     /// </summary>
     static void Guardar(string nome)
     {
@@ -112,6 +112,62 @@ public class CapturaDeInterfaceTests
         Guardar("01_menu_principal");
         yield return null;
         yield return null;
+    }
+
+    [UnityTest]
+    public IEnumerator Tela_EscolhaDeDificuldade()
+    {
+        // "Novo jogo" abre a escolha de dificuldade, e é ali que a partida
+        // começa. Se o botão parar de levar para lá, não há mais como escolher.
+        SceneManager.LoadScene("00_MenuPrincipal");
+        yield return null;
+        for (int i = 0; i < 30; i++) yield return null;
+
+        var novoJogo = System.Array.Find(
+            Object.FindObjectsOfType<UnityEngine.UI.Button>(),
+            b => b.name == "Botao_Novo jogo");
+        Assert.IsNotNull(novoJogo, "a tela inicial não tem o botão Novo jogo");
+
+        novoJogo.onClick.Invoke();
+        yield return null;
+        yield return null;
+
+        var rotulos = System.Array.ConvertAll(
+            Object.FindObjectsOfType<UnityEngine.UI.Text>(), t => t.text);
+        CollectionAssert.Contains(rotulos, "Fácil", "sem a opção Fácil na escolha");
+        CollectionAssert.Contains(rotulos, "Difícil", "sem a opção Difícil na escolha");
+
+        Guardar("01b_escolha_de_dificuldade");
+        yield return null;
+        yield return null;
+    }
+
+    [UnityTest]
+    public IEnumerator Tela_Creditos()
+    {
+        // A entrega exige a fonte dos assets numa tela de créditos do jogo.
+        SceneManager.LoadScene("00_MenuPrincipal");
+        yield return null;
+        for (int i = 0; i < 30; i++) yield return null;
+
+        var creditos = Object.FindObjectOfType<CreditosUI>();
+        Assert.IsNotNull(creditos, "o menu não tem tela de créditos");
+
+        creditos.Abrir();
+        yield return null;
+        yield return null;
+        Assert.IsTrue(creditos.Aberta);
+
+        var textos = Object.FindObjectsOfType<UnityEngine.UI.Text>();
+        var corpo = System.Array.Find(textos, t => t.text.Contains("Anokolisa"));
+        Assert.IsNotNull(corpo, "os créditos não citam a origem da arte");
+        StringAssert.Contains("Fabrício", corpo.text, "os créditos não trazem a equipe");
+
+        Guardar("05_creditos");
+        yield return null;
+        yield return null;
+
+        creditos.Fechar();
     }
 
     [UnityTest]
