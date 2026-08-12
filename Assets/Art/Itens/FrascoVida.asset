@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7556be4c9dbd7f94b80bc359a952dd2a, type: 3}
   m_Name: FrascoVida
   m_EditorClassIdentifier: 
-  sprite: {fileID: 2033469430632351504}
---- !u!213 &2033469430632351504
+  sprite: {fileID: 6000446351814640185}
+--- !u!213 &6000446351814640185
 Sprite:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
