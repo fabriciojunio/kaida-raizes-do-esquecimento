@@ -22,13 +22,22 @@ public class BossPhase1State : State
 
     public override void PhysicsUpdate()
     {
-        // flutua num vaivém lento e alto, forçando o combate à distância
-        if (b.Body != null)
+        if (b.Body == null) return;
+
+        // Vaivém lento que desce até a altura do jogador de tempos em tempos.
+        // Ficando sempre no alto, ele era intocável: o ataque da Kaida é
+        // corpo a corpo e o confronto não saía do lugar.
+        float vx = Mathf.Sin(tempoNoEstado * 0.7f) * 1.8f;
+        float vy = Mathf.Cos(tempoNoEstado * 1.1f) * 0.6f;
+
+        if (b.player != null)
         {
-            float vx = Mathf.Sin(tempoNoEstado * 0.7f) * 1.8f;
-            float vy = Mathf.Cos(tempoNoEstado * 1.1f) * 0.6f;
-            b.Body.velocity = new Vector2(vx, vy);
+            float diferenca = b.player.position.y + 1.5f - b.transform.position.y;
+            // aproxima devagar da altura de quem está jogando
+            vy += Mathf.Clamp(diferenca, -1.6f, 1.6f) * 0.8f;
         }
+
+        b.Body.velocity = new Vector2(vx, vy);
     }
 
     public override void LogicUpdate()
