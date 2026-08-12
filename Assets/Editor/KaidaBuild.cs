@@ -60,6 +60,10 @@ public static class KaidaBuild
         Physics2D.IgnoreLayerCollision(PrefabBuilder.LayerPlayer, PrefabBuilder.LayerEnemy, true);
         Physics2D.IgnoreLayerCollision(PrefabBuilder.LayerEnemy, PrefabBuilder.LayerEnemy, true);
 
+        // O colisor do chefe é um gatilho — ele voa e não pode esbarrar no
+        // cenário. Sem isto, o golpe da Kaida não o encontraria.
+        Physics2D.queriesHitTriggers = true;
+
         // pixel art não pode ser filtrada nem anti-aliased
         QualitySettings.antiAliasing = 0;
 

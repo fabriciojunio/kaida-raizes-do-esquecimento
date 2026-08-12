@@ -36,43 +36,43 @@ public static class SceneBuilder
         "................................................................",
         "................................................................",
         "................................................................",
-        ".........................F......................................",
-        "......................========..................................",
         "................................................................",
         "................................................................",
-        ".............................................====...............",
+        ".....................N..........................................",
+        "..................=======.......................................",
         "................................................................",
         "................................................................",
-        "..................................................N.............",
-        "..............................................=======...........",
+        "..............=======.........=======...........................",
         "................................................................",
+        ".............F..................................................",
+        "..........=======.........=======...........=======.............",
         "................................................................",
-        "..............P....C.........B..............B.................>.",
-        "#######################....#####################################",
-        "#######################....#####################################",
-        "#######################XXXX#####################################",
+        "..............P....C..................B.............B........>..",
+        "################################################################",
+        "################################################################",
+        "################################################################",
     };
 
     static readonly string[] FlorestaSilente = {
         "................................................................",
         "................................................................",
         "................................................................",
-        "...............................................H................",
-        "..........................................==========............",
         "................................................................",
-        "..............................F.................................",
-        "....................=========...................................",
-        "................................................................",
-        "..............................................B.................",
-        "...........======................====================...........",
-        "................................................................",
-        "..........................S.....................................",
-        "...............=====================............................",
+        "...................................H............................",
+        "................................=======.........................",
         "................................................................",
         "................................................................",
-        ".<..............p....C........B..............B......C.........>.",
-        "###########....######################....#######################",
-        "###########XXXX######################XXXX#######################",
+        "............................=======.............................",
+        "................................................................",
+        "...........................S....................................",
+        "........................=======.............=======.............",
+        "................................................................",
+        ".......................F........................................",
+        "....................=======.............=======.................",
+        "................................................................",
+        ".<............p...C...............B.................B...C....>..",
+        "################################################################",
+        "################################################################",
         "################################################################",
     };
 
@@ -81,47 +81,47 @@ public static class SceneBuilder
     static readonly string[] LagoSilente = {
         "................................................................",
         "................................................................",
-        "........................===========.............................",
-        ".............................F..................................",
         "................................................................",
-        "..........=====...................................=====.........",
         "................................................................",
-        "....................=====...............=====...................",
-        "......................A...................A.....................",
         "................................................................",
-        "..............................=======...........................",
-        ".................................N..............................",
         "................................................................",
-        "......................====.....====.....====....................",
         "................................................................",
-        ".<..............p.C.................................B...C....>..",
-        "####################~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##############",
-        "####################::::::::::::::::::::::::::::::##############",
-        "####################::::::::::::::::::::::::::::::##############",
+        ".....................................A..........................",
+        "..................................=======.......................",
+        "................................................................",
+        ".................................................N..............",
+        "..........................=======.............=======...........",
+        "................................................................",
+        "........................F.......................................",
+        "......................=====...=====...=====.....................",
+        "................................................................",
+        ".<............p..C................................C.....B....>..",
+        "####################~~~~~~~~~~~~~~~~~~~~~~~~~~##################",
+        "####################::::::::::::::::::::::::::##################",
         "################################################################",
     };
 
     static readonly string[] CavernaMusgosa = {
         "................................................................",
-        "..........................................................H.....",
-        "......................................................==========",
         "................................................................",
-        "................................A...............................",
-        "..................................====================..........",
         "................................................................",
-        "............................N...................................",
-        "....................=========...................................",
         "................................................................",
-        "..............A.................................................",
-        "........==========..............................................",
+        "...........................H....................................",
+        "........................=======.................................",
         "................................................................",
-        "..............................S.........S.......................",
-        "................========================........................",
+        ".......................N........................................",
+        "....................=======...........=======...................",
         "................................................................",
-        "......F.........................................................",
-        ".<................p....C....S...........................C.....>.",
-        "############....########################........################",
-        "############XXXX########################XXXXXXXX################",
+        ".....................................A..........................",
+        "................=======...........=======.......................",
+        "................................................................",
+        ".................................S..............................",
+        "............=======...........=======...........=======.........",
+        "................................................................",
+        ".<............p...C.....................S.....A.........C....>..",
+        "################################################################",
+        "################################################################",
+        "################################################################",
     };
 
     // Arena do chefe. As plataformas são escadas dos dois lados: o Guardião
@@ -131,21 +131,21 @@ public static class SceneBuilder
         "................................................................",
         "................................................................",
         "................................................................",
-        "..................====....................====..................",
-        "................................................................",
-        "................................................................",
-        "..........====................................====..............",
-        "................................................................",
-        "..............................G.................................",
-        "................................................................",
-        "....====..............................................====......",
-        "................................................................",
-        "................................................................",
-        "..............===..............................===..............",
         "................................................................",
         "................................................................",
         "................................................................",
-        ".<..............p.............C.................................",
+        "................................................................",
+        "................................G...............................",
+        "............................=========...........................",
+        "................................................................",
+        "................................................................",
+        "....................=======...........=======...................",
+        "................................................................",
+        "................................................................",
+        "..........=======...............................=======.........",
+        "................................................................",
+        ".<............p...............C.................................",
+        "################################################################",
         "################################################################",
         "################################################################",
     };
@@ -288,7 +288,10 @@ public static class SceneBuilder
             Object.DestroyImmediate(kaida.GetComponent<Rigidbody2D>());
             foreach (var c in kaida.GetComponentsInChildren<Collider2D>()) Object.DestroyImmediate(c);
 
-            kaida.transform.position = new Vector3(largura * 0.62f, 3f, 0f);
+            // apoiada no piso do cenário, não numa altura chutada: com y fixo
+            // ela ficava pairando um tile acima da grama
+            float piso = AlturaDoChao(vitrine, largura, altura, (int)(largura * 0.62f));
+            kaida.transform.position = new Vector3(largura * 0.62f, piso, 0f);
 
             var vitrineScript = kaida.AddComponent<KaidaDeVitrine>();
             vitrineScript.animator = kaida.GetComponent<Animator>();
@@ -300,6 +303,11 @@ public static class SceneBuilder
         sistemas.AddComponent<GameManager>();
         sistemas.AddComponent<SaveSystem>();
         AdicionarTrilha(sistemas, "00_MenuPrincipal");
+        // Em objeto separado, sem DontDestroyOnLoad: o _Sistemas do menu
+        // sobrevive à troca de cena e o da região seguinte é descartado por
+        // ser duplicata. Junto, o cursor do menu continuaria valendo no jogo.
+        var cursorMenu = new GameObject("Cursor");
+        cursorMenu.AddComponent<ControleDoCursor>().mostrarCursor = true;
 
         // desfoque primeiro (fica atrás), menu depois
         var fundo = new GameObject("FundoDesfocado");
@@ -422,11 +430,12 @@ public static class SceneBuilder
         {
             for (int coluna = 0; coluna < largura; coluna++)
             {
+                // as plataformas '=' vão para outra camada, atravessável
                 char c = r.mapa[linha][coluna];
-                if (c != '#' && c != '=') continue;
+                if (c != '#') continue;
 
                 // usa o tile com grama quando não há nada sólido logo acima
-                bool descoberto = linha == 0 || (r.mapa[linha - 1][coluna] != '#' && r.mapa[linha - 1][coluna] != '=');
+                bool descoberto = linha == 0 || r.mapa[linha - 1][coluna] != '#';
                 var tile = descoberto ? topo : miolo;
                 tilemap.SetTile(new Vector3Int(coluna, altura - 1 - linha, 0), tile);
             }
@@ -434,6 +443,8 @@ public static class SceneBuilder
 
         tilemap.RefreshAllTiles();
         tilemap.CompressBounds();
+
+        MontarPlataformas(r, gridGO, largura, altura);
 
         // agora sim os colisores, sobre um mapa já preenchido
         var col = tmGO.AddComponent<TilemapCollider2D>();
@@ -456,6 +467,62 @@ public static class SceneBuilder
 
         MontarAgua(r, gridGO, largura, altura);
         return tilemap;
+    }
+
+    /// <summary>
+    /// Plataformas atravessáveis: sobe-se por baixo e pousa-se em cima.
+    ///
+    /// Ficam numa camada própria com PlatformEffector2D. Sem isso, uma
+    /// plataforma no meio do caminho vira parede: o jogador bate a cabeça e
+    /// não consegue passar, o que travava a travessia em várias regiões.
+    /// </summary>
+    static void MontarPlataformas(Regiao r, GameObject grid, int largura, int altura)
+    {
+        bool tem = false;
+        foreach (var l in r.mapa) if (l.IndexOf('=') >= 0) { tem = true; break; }
+        if (!tem) return;
+
+        var topo = AssetDatabase.LoadAssetAtPath<Tile>(TileSetup.CaminhoTopo);
+        if (topo == null) return;
+
+        var go = new GameObject("Plataformas");
+        go.transform.SetParent(grid.transform, false);
+        go.layer = PrefabBuilder.LayerGround;
+
+        var tilemap = go.AddComponent<Tilemap>();
+        var renderer = go.AddComponent<TilemapRenderer>();
+        renderer.sortingOrder = 0;
+        tilemap.color = r.tint;
+
+        for (int linha = 0; linha < altura; linha++)
+            for (int coluna = 0; coluna < largura; coluna++)
+                if (r.mapa[linha][coluna] == '=')
+                    tilemap.SetTile(new Vector3Int(coluna, altura - 1 - linha, 0), topo);
+
+        tilemap.RefreshAllTiles();
+        tilemap.CompressBounds();
+
+        var col = go.AddComponent<TilemapCollider2D>();
+        var composto = go.AddComponent<CompositeCollider2D>();
+        composto.geometryType = CompositeCollider2D.GeometryType.Polygons;
+        composto.generationType = CompositeCollider2D.GenerationType.Synchronous;
+
+        var rb = go.GetComponent<Rigidbody2D>();
+        rb.bodyType = RigidbodyType2D.Static;
+
+        col.usedByComposite = true;
+        composto.usedByEffector = true;
+        composto.GenerateGeometry();
+
+        // só bloqueia quem vem de cima; por baixo e pelos lados, passa
+        var efeito = go.AddComponent<PlatformEffector2D>();
+        efeito.useOneWay = true;
+        efeito.useOneWayGrouping = true;
+        efeito.surfaceArc = 150f;
+        efeito.useSideFriction = false;
+        efeito.useSideBounce = false;
+
+        go.AddComponent<GarantirColisaoDoChao>();
     }
 
     /// <summary>
@@ -492,6 +559,43 @@ public static class SceneBuilder
             }
         }
         tilemap.RefreshAllTiles();
+
+        // Afogamento: cair no lago custa vida e devolve ao último marco. Sem
+        // isso dava para andar dentro d'água como se fosse chão pintado, e a
+        // travessia por plataformas perdia completamente o sentido.
+        for (int linha = 0; linha < altura; linha++)
+        {
+            int inicio = -1;
+            for (int coluna = 0; coluna <= largura; coluna++)
+            {
+                bool ehAgua = coluna < largura && r.mapa[linha][coluna] == '~';
+                if (ehAgua && inicio < 0) inicio = coluna;
+                else if (!ehAgua && inicio >= 0)
+                {
+                    CriarFaixaDeAfogamento(go.transform, inicio, coluna - 1, altura - 1 - linha);
+                    inicio = -1;
+                }
+            }
+        }
+    }
+
+    /// <summary>Um trigger por trecho contínuo de água, em vez de um por tile.</summary>
+    static void CriarFaixaDeAfogamento(Transform pai, int colunaInicial, int colunaFinal, float y)
+    {
+        var go = new GameObject("Afogamento");
+        go.transform.SetParent(pai, false);
+
+        float largura = colunaFinal - colunaInicial + 1;
+        go.transform.position = new Vector3(colunaInicial + largura * 0.5f, y + 0.2f, 0f);
+
+        var col = go.AddComponent<BoxCollider2D>();
+        col.isTrigger = true;
+        col.size = new Vector2(largura, 0.9f);
+
+        var h = go.AddComponent<Hazard>();
+        h.damage = 1;
+        h.returnToCheckpoint = true;
+        h.repeatInterval = 1f;
     }
 
     /// <summary>
@@ -528,16 +632,23 @@ public static class SceneBuilder
             }
         }
 
-        // --- casas: só a Orla da Vila ---
+        // --- casas: só a Orla da Vila, e só no chão ---
         if (r.temCasas)
         {
             var casa = RecorteDeSprites.Carregar(RecorteDeSprites.Casa);
             var porta = RecorteDeSprites.Carregar(RecorteDeSprites.Porta);
-            int[] colunas = { 6, 24, 46 };
+
+            // Nível do piso principal. As casas só entram aqui: empoleiradas
+            // em plataforma solta, no meio do ar, elas não fazem sentido
+            // nenhum e ainda escondem o caminho.
+            float nivelDoPiso = AlturaDoChao(r, largura, altura, 0);
+
+            int[] colunas = { 5, 25, 44 };
             foreach (int col in colunas)
             {
                 float chao = AlturaDoChao(r, largura, altura, col);
                 if (chao < 0f) continue;
+                if (Mathf.Abs(chao - nivelDoPiso) > 0.1f) continue;   // não é o piso
 
                 if (casa != null)
                 {
@@ -719,32 +830,38 @@ public static class SceneBuilder
             // As alturas de partida também são escalonadas: a emenda entre
             // fileiras de uma camada cai no meio da folhagem da outra, em vez
             // de todas se alinharem numa faixa horizontal atravessando a tela.
+            // As cores das camadas ficam próximas entre si de propósito. Com
+            // contraste alto, o retângulo de cada cópia aparece como um bloco
+            // escuro no fundo — e o jogador tenta pular em cima dele achando
+            // que é plataforma.
+            var baseDaMata = Color.Lerp(CorProfunda(r), r.tint, 0.30f);
+
             PreencherComCopias(pai.transform, "MataAoFundo", arvores,
                 x0: -largura * 0.35f, x1: largura * 1.4f,
                 yBase: -6f, yTopo: altura * 1.7f,
                 ordem: -140, z: 26f,
-                cor: Color.Lerp(CorProfunda(r), r.tint, 0.22f),
+                cor: baseDaMata,
                 fator: 0.16f);
 
             PreencherComCopias(pai.transform, "MataMeia", arvores,
                 x0: -largura * 0.3f + PeriodoDosVaos * 0.5f, x1: largura * 1.35f,
                 yBase: -11f, yTopo: altura * 1.5f,
                 ordem: -120, z: 24f,
-                cor: Color.Lerp(CorProfunda(r), r.tint, 0.32f),
+                cor: Color.Lerp(baseDaMata, r.tint, 0.12f),
                 fator: 0.22f);
 
             PreencherComCopias(pai.transform, "MataDistante", arvores,
                 x0: -largura * 0.25f + PeriodoDosVaos * 0.25f, x1: largura * 1.3f,
                 yBase: -3f, yTopo: altura * 1.3f,
                 ordem: -90, z: 20f,
-                cor: Color.Lerp(CorProfunda(r), r.tint, 0.45f),
+                cor: Color.Lerp(baseDaMata, r.tint, 0.24f),
                 fator: 0.3f);
 
             PreencherComCopias(pai.transform, "MataProxima", arvores,
                 x0: -largura * 0.15f + PeriodoDosVaos * 0.75f, x1: largura * 1.2f,
                 yBase: -9f, yTopo: altura * 1f,
                 ordem: -70, z: 15f,
-                cor: Color.Lerp(CorProfunda(r), r.tint, 0.75f),
+                cor: Color.Lerp(baseDaMata, r.tint, 0.38f),
                 fator: 0.5f);
         }
     }
@@ -819,6 +936,10 @@ public static class SceneBuilder
         sistemas.AddComponent<SaveSystem>();
         sistemas.AddComponent<MessageUI>();
         AdicionarTrilha(sistemas, r.arquivo);
+
+        // fora do _Sistemas de propósito: aquele objeto atravessa as cenas
+        var cursor = new GameObject("Cursor");
+        cursor.AddComponent<ControleDoCursor>().mostrarCursor = false;
 
         var prefabJogador = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Kaida.prefab");
         Vector2 inicio = AcharCaractere(r.mapa, 'P', largura, altura);

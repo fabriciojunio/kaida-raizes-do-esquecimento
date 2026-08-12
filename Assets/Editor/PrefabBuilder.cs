@@ -110,10 +110,13 @@ public static class PrefabBuilder
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
         rb.interpolation = RigidbodyInterpolation2D.Interpolate;
 
+        // Estreito e com a base logo acima do pivô. Um colisor largo engancha
+        // na quina das plataformas: o mesmo salto funcionava de um lado e
+        // falhava do outro, dependendo de qual borda a personagem raspava.
         var col = go.AddComponent<CapsuleCollider2D>();
         col.direction = CapsuleDirection2D.Vertical;
-        col.size = new Vector2(1.15f, 2.85f);   // mais estreito que o desenho: não prende em vãos
-        col.offset = new Vector2(0f, 1.44f);    // o pivô do sprite está nos pés
+        col.size = new Vector2(0.85f, 2.7f);
+        col.offset = new Vector2(0f, 1.36f);    // o pivô do sprite está nos pés
         col.sharedMaterial = MaterialSemAtrito();
 
         var anim = go.AddComponent<Animator>();
@@ -122,16 +125,20 @@ public static class PrefabBuilder
         anim.applyRootMotion = false;
 
         var groundCheck = Filho(go, "GroundCheck", new Vector3(0f, 0.06f, 0f));
-        var attackPoint = Filho(go, "AttackPoint", new Vector3(1.1f, 1.5f, 0f));
+        var attackPoint = Filho(go, "AttackPoint", new Vector3(1.5f, 1.4f, 0f));
         var wallCheck   = Filho(go, "WallCheck",   new Vector3(0.5f, 1.6f, 0f));
 
         var pc = go.AddComponent<PlayerController>();
         pc.stats = stats;
         pc.groundCheck = groundCheck.transform;
-        pc.groundCheckRadius = 0.22f;
+        // raio um pouco maior que a metade do colisor: a personagem reconhece
+        // que está no chão mesmo pisando na beirada de uma plataforma
+        pc.groundCheckRadius = 0.42f;
         pc.groundLayer = MaskGround;
         pc.attackPoint = attackPoint.transform;
-        pc.attackRadius = 0.95f;
+        // O alcance acompanha a espada, que é longa: com 0,95 só acertava
+        // quem estivesse praticamente colado na personagem.
+        pc.attackRadius = 1.35f;
         pc.enemyLayer = MaskEnemy;
         pc.wallCheck = wallCheck.transform;
         pc.wallCheckDistance = 0.35f;
@@ -275,20 +282,30 @@ public static class PrefabBuilder
     {
         var go = new GameObject("GuardiaoDoLumen");
         go.layer = LayerEnemy;
-        go.transform.localScale = Vector3.one * 2.6f;   // presença de chefe
+        go.transform.localScale = Vector3.one * 2.1f;   // presença de chefe
 
         var sr = go.AddComponent<SpriteRenderer>();
         sr.sprite = PrimeiroSprite("Assets/Art/Enemies/Bee/Bee-Fly.png");
         sr.color = new Color(0.72f, 0.8f, 1f);          // corrompido pelo lúmen
         sr.sortingOrder = 9;
 
+        // Cinemático: ele voa e é movido por código, não pela física.
+        //
+        // Como corpo dinâmico, ele pousava em cima das plataformas da arena.
+        // A física zerava a velocidade vertical e o Guardião passava a luta
+        // inteira empoleirado, alto demais para o golpe corpo a corpo — o
+        // confronto simplesmente não tinha saída.
         var rb = go.AddComponent<Rigidbody2D>();
+        rb.bodyType = RigidbodyType2D.Kinematic;
         rb.gravityScale = 0f;
         rb.freezeRotation = true;
 
+        // Colisor generoso e baixo, como gatilho: serve para receber o golpe,
+        // não para esbarrar no cenário.
         var col = go.AddComponent<CircleCollider2D>();
-        col.radius = 0.75f;
-        col.offset = new Vector2(0f, 1.4f);
+        col.radius = 1.15f;
+        col.offset = new Vector2(0f, 0.9f);
+        col.isTrigger = true;
 
         var anim = go.AddComponent<Animator>();
         anim.runtimeAnimatorController =
@@ -302,13 +319,15 @@ public static class PrefabBuilder
         boss.healthFase3 = 16;
         boss.beamPrefab = AssetDatabase.LoadAssetAtPath<GameObject>($"{PastaPrefabs}/LumenBeam.prefab");
         boss.beamOrigin = origem.transform;
-        boss.beamInterval = 1.5f;
-        boss.beamSpeed = 7f;
+        // Ritmo com folga para ler e revidar. Os valores anteriores não davam
+        // espaço entre um ataque e o seguinte.
+        boss.beamInterval = 2.4f;
+        boss.beamSpeed = 6f;
         boss.beamsPorSalva = 3;
-        boss.ecosPorOnda = 3;
-        boss.intervaloEntreOndas = 6f;
-        boss.velocidadeInvestida = 7.5f;
-        boss.intervaloInvestida = 1.6f;
+        boss.ecosPorOnda = 2;
+        boss.intervaloEntreOndas = 8f;
+        boss.velocidadeInvestida = 6f;
+        boss.intervaloInvestida = 2.4f;
         boss.danoContato = 1;
         boss.animator = anim;
         boss.spriteRenderer = sr;
