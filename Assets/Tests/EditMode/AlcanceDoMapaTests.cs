@@ -51,7 +51,7 @@ public class AlcanceDoMapaTests
                             .FirstOrDefault(p => p != null);
         Assert.IsNotNull(jogador, "sem jogador na cena");
 
-        var alcancaveis = Espalhar(superficies, jogador.transform.position);
+        var alcancaveis = Espalhar(superficies, jogador.transform.position, Pocos(raizes));
 
         // tudo com que o jogador precisa interagir
         var alvos = new List<(string, Vector3)>();
@@ -95,7 +95,7 @@ public class AlcanceDoMapaTests
         var superficies = LevantarSuperficies(raizes);
         var jogador = raizes.Select(r => r.GetComponentInChildren<PlayerController>())
                             .FirstOrDefault(p => p != null);
-        var alcancaveis = Espalhar(superficies, jogador.transform.position);
+        var alcancaveis = Espalhar(superficies, jogador.transform.position, Pocos(raizes));
 
         var ilhadas = superficies.Except(alcancaveis).ToList();
         var colunas = ilhadas.Select(p => Mathf.RoundToInt(p.x)).Distinct().OrderBy(x => x).Take(10);
@@ -137,7 +137,91 @@ public class AlcanceDoMapaTests
             string.Join(", ", buracos.Take(12)));
     }
 
+    [TestCase("Assets/Scenes/01_OrlaDaVila.unity")]
+    [TestCase("Assets/Scenes/02_FlorestaSilente.unity")]
+    [TestCase("Assets/Scenes/03_LagoSilente.unity")]
+    [TestCase("Assets/Scenes/04_CavernaMusgosa.unity")]
+    [TestCase("Assets/Scenes/05_SantuarioEsquecido.unity")]
+    public void HabilidadeDoPoco_EstaAoAlcanceAntesDoPoco(string caminho)
+    {
+        // Se o poço fosse alcançável antes da habilidade que ele cobra, o
+        // jogador ficaria preso no pé dele sem entender por quê. A varredura
+        // aqui roda SEM os poços: o que abre o poço tem que ser pegável assim.
+        var cena = EditorSceneManager.OpenScene(caminho, OpenSceneMode.Single);
+        var raizes = cena.GetRootGameObjects();
+
+        var pocos = Pocos(raizes);
+        if (pocos.Count == 0) Assert.Pass("região sem poço de escalada");
+
+        var superficies = LevantarSuperficies(raizes);
+        var jogador = raizes.Select(r => r.GetComponentInChildren<PlayerController>())
+                            .FirstOrDefault(p => p != null);
+        var semPoco = Espalhar(superficies, jogador.transform.position, new List<Rect>());
+
+        var habilidades = raizes.SelectMany(r => r.GetComponentsInChildren<PickupAbility>())
+                                .Where(p => p.abilityId == "wall_climb")
+                                .ToList();
+
+        Assert.IsNotEmpty(habilidades,
+            "a região tem poço de escalada mas não tem onde pegar a habilidade");
+
+        foreach (var h in habilidades)
+        {
+            var pos = h.transform.position;
+            bool perto = semPoco.Any(s =>
+                Mathf.Abs(s.x - pos.x) <= 3f && Mathf.Abs(s.y - pos.y) <= 5f);
+            Assert.IsTrue(perto,
+                $"a escalada de parede em ({pos.x:F0}, {pos.y:F0}) só é alcançável " +
+                "com a própria escalada de parede");
+        }
+    }
+
+    [TestCase("Assets/Scenes/04_CavernaMusgosa.unity")]
+    public void PocoDeEscalada_TemParedesDeFrenteUmaParaAOutra(string caminho)
+    {
+        // Poço sem parede dos dois lados não dá salto de parede: dá queda.
+        var cena = EditorSceneManager.OpenScene(caminho, OpenSceneMode.Single);
+        var raizes = cena.GetRootGameObjects();
+
+        var tilemap = raizes.SelectMany(r => r.GetComponentsInChildren<Tilemap>())
+                            .FirstOrDefault(t => t.name == "Ground");
+        Assert.IsNotNull(tilemap, "sem tilemap de chão");
+
+        foreach (var poco in raizes.SelectMany(r => r.GetComponentsInChildren<PocoDeEscalada>()))
+        {
+            var a = poco.area;
+            var semParede = new List<int>();
+
+            // metade de baixo do poço: é onde a subida começa e onde faltar
+            // parede trava o jogador
+            for (int y = Mathf.CeilToInt(a.yMin) + 2; y < Mathf.FloorToInt(a.yMax) - 1; y++)
+            {
+                bool esquerda = false, direita = false;
+                for (int x = Mathf.CeilToInt(a.xMin); x <= Mathf.FloorToInt(a.xMax); x++)
+                {
+                    if (tilemap.GetTile(new Vector3Int(x, y, 0)) == null) continue;
+                    if (x < a.center.x) esquerda = true; else direita = true;
+                }
+                if (!esquerda || !direita) semParede.Add(y);
+            }
+
+            // as duas fileiras do topo podem ser abertas: é a saída do poço
+            Assert.LessOrEqual(semParede.Count, 2,
+                $"o poço em {a} não tem parede dos dois lados nas alturas " +
+                string.Join(", ", semParede));
+
+            float largura = a.width;
+            Assert.LessOrEqual(largura, 10f,
+                $"o poço tem {largura:F0} de vão: largo demais para o salto de parede");
+        }
+    }
+
     // ------------------------------------------------------------ utilidades
+    static List<Rect> Pocos(GameObject[] raizes) =>
+        raizes.SelectMany(r => r.GetComponentsInChildren<PocoDeEscalada>())
+              .Select(p => p.area)
+              .ToList();
+
     /// <summary>Todo topo de tile com espaço livre acima para o corpo caber.</summary>
     static List<Vector2> LevantarSuperficies(GameObject[] raizes)
     {
@@ -168,8 +252,12 @@ public class AlcanceDoMapaTests
         return achadas;
     }
 
-    /// <summary>Espalha a partir do ponto de partida, respeitando o alcance.</summary>
-    static HashSet<Vector2> Espalhar(List<Vector2> superficies, Vector3 origem)
+    /// <summary>
+    /// Espalha a partir do ponto de partida, respeitando o alcance. Dentro de
+    /// um poço de escalada o limite de subida não vale: ali o jogador sobe de
+    /// parede em parede, e não de salto.
+    /// </summary>
+    static HashSet<Vector2> Espalhar(List<Vector2> superficies, Vector3 origem, List<Rect> pocos)
     {
         if (superficies.Count == 0) return new HashSet<Vector2>();
 
@@ -190,9 +278,11 @@ public class AlcanceDoMapaTests
                 float dx = Mathf.Abs(s.x - atual.x);
                 float dy = s.y - atual.y;
 
-                if (dx > VaoMaximo) continue;
-                if (dy > SubidaMaxima) continue;      // alto demais para subir
-                if (-dy > QuedaMaxima) continue;      // queda longa demais
+                bool noMesmoPoco = pocos.Any(p => p.Contains(atual) && p.Contains(s));
+
+                if (dx > VaoMaximo && !noMesmoPoco) continue;
+                if (dy > SubidaMaxima && !noMesmoPoco) continue;   // alto demais para subir
+                if (-dy > QuedaMaxima) continue;                   // queda longa demais
 
                 vistos.Add(s);
                 fila.Push(s);

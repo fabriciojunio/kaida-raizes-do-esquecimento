@@ -77,7 +77,7 @@ public static class SceneBuilder
     };
 
     // Lago Silente: a travessia é por cima da água, saltando entre
-    // plataformas. Cair não mata — só devolve o caminho já andado.
+    // plataformas. Cair não mata - só devolve o caminho já andado.
     static readonly string[] LagoSilente = {
         "................................................................",
         "................................................................",
@@ -101,24 +101,31 @@ public static class SceneBuilder
         "################################################################",
     };
 
+    // Caverna Musgosa: a região da escalada de parede.
+    //
+    // A saída fica no alto de um poço fechado nas colunas 56 e 61-63. Andar
+    // reto até a passagem não funciona mais: quem chega ao pé do poço só sobe
+    // saltando de uma parede para a outra, e para isso precisa ter pegado o
+    // 'H' lá atrás. Antes as cinco regiões eram atravessáveis pelo chão do
+    // começo ao fim, e as duas habilidades nunca chegavam a ser cobradas.
     static readonly string[] CavernaMusgosa = {
         "................................................................",
         "................................................................",
         "................................................................",
-        "................................................................",
-        "...........................H....................................",
-        "........................=======.................................",
-        "................................................................",
-        ".......................N........................................",
-        "....................=======...........=======...................",
-        "................................................................",
-        ".....................................A..........................",
-        "................=======...........=======.......................",
-        "................................................................",
-        ".................................S..............................",
-        "............=======...........=======...........=======.........",
-        "................................................................",
-        ".<............p...C.....................S.....A.........C....>..",
+        "..............................................................>.",
+        "...........................H...........................##....###",
+        "........................=======........................##....###",
+        ".......................................................##....###",
+        ".......................N...............................##....###",
+        "....................=======...........=======..........##....###",
+        ".......................................................##....###",
+        ".....................................A.................##....###",
+        "................=======...........=======..............##....###",
+        ".......................................................##....###",
+        ".................................S.....................##....###",
+        "............=======...........=======...........=======......###",
+        ".............................................................###",
+        ".<............p...C.....................S.....A....C.........###",
         "################################################################",
         "################################################################",
         "################################################################",
@@ -126,7 +133,7 @@ public static class SceneBuilder
 
     // Arena do chefe. As plataformas são escadas dos dois lados: o Guardião
     // flutua na altura da plataforma do meio, então dá para alcançá-lo nas
-    // fases 1 e 2 sem precisar do pulo duplo — que ainda assim ajuda muito.
+    // fases 1 e 2 sem precisar do pulo duplo - que ainda assim ajuda muito.
     static readonly string[] SantuarioEsquecido = {
         "................................................................",
         "................................................................",
@@ -162,12 +169,20 @@ public static class SceneBuilder
         public string arvore;
         /// <summary>Quantas árvores espalhar no fundo.</summary>
         public int densidadeDeArvores;
-        /// <summary>Casas na borda do cenário — só a Vila tem.</summary>
+        /// <summary>Casas na borda do cenário - só a Vila tem.</summary>
         public bool temCasas;
         /// <summary>Arbustos e cogumelos em cima do chão.</summary>
         public bool temVegetacaoDeChao;
         /// <summary>Quedas d'água caindo no lago.</summary>
         public bool temCachoeiras;
+
+        /// <summary>
+        /// Poço vertical que só se vence saltando de parede em parede. Fica
+        /// declarado aqui, e não deduzido do mapa, porque é uma decisão de
+        /// level design: é o trecho que cobra a habilidade.
+        /// Rect vazio = a região não tem poço.
+        /// </summary>
+        public Rect pocoDeEscalada;
     }
 
     [MenuItem("Kaida/5. Gerar cenas")]
@@ -177,7 +192,7 @@ public static class SceneBuilder
 
         var regioes = new[]
         {
-            // Cada região tem cor de árvore, tint e densidade próprias — é o
+            // Cada região tem cor de árvore, tint e densidade próprias - é o
             // que faz o vale parecer quatro lugares e não o mesmo mapa repetido.
             new Regiao {
                 arquivo = "01_OrlaDaVila", mapa = OrlaDaVila,
@@ -210,7 +225,9 @@ public static class SceneBuilder
                 proxima = "05_SantuarioEsquecido", anterior = "03_LagoSilente",
                 fundo = "Assets/Art/Environment/Cavern/CavernBg1.png",
                 arvore = "",                                 // não crescem árvores lá embaixo
-                densidadeDeArvores = 0, temCasas = false, temVegetacaoDeChao = true
+                densidadeDeArvores = 0, temCasas = false, temVegetacaoDeChao = true,
+                // paredes nas colunas 55-56 e 61-63, chão em y=3, borda de cima em y=17
+                pocoDeEscalada = new Rect(54.5f, 2.5f, 10f, 15f)
             },
             new Regiao {
                 arquivo = "05_SantuarioEsquecido", mapa = SantuarioEsquecido,
@@ -342,15 +359,21 @@ public static class SceneBuilder
         "Luan Miranda Padilha\n" +
         "Kauã Limão Nunes";
 
-    /// <summary>Cenário curto que fica rodando atrás do menu.</summary>
+    /// <summary>
+    /// Cenário curto que fica rodando atrás do menu.
+    ///
+    /// Sem plataformas soltas: aqui não se joga, então um pedaço de terra
+    /// pairando no meio do nada não é level design, é sujeira na tela - e era
+    /// exatamente assim que aparecia atrás do desfoque.
+    /// </summary>
     static readonly string[] CenarioDoMenu = {
         "..............................",
         "..............................",
         "..............................",
-        "..........====................",
         "..............................",
         "..............................",
-        "....................====......",
+        "..............................",
+        "..............................",
         "..............................",
         "..............................",
         "..............................",
@@ -373,7 +396,7 @@ public static class SceneBuilder
         var trilha = alvo.AddComponent<TrilhaSonora>();
 
         // Volumes baixos de propósito: é trilha de fundo, para dar presença ao
-        // lugar sem disputar atenção com o jogo. Notas longas reforçam isso —
+        // lugar sem disputar atenção com o jogo. Notas longas reforçam isso -
         // quanto mais lento o arpejo, menos ele soa como "música tocando" e
         // mais como o ambiente do vale.
         if (regiao.StartsWith("00_"))      { trilha.tonica = 220.00f; trilha.duracaoDaNota = 1.15f; trilha.volume = 0.085f; }
@@ -436,12 +459,12 @@ public static class SceneBuilder
 
         // Os tiles vêm ANTES dos colisores. O TilemapCollider2D monta a forma
         // a partir do que existe no tilemap no momento em que é criado; num
-        // tilemap ainda vazio ele nasce sem nada e não se recompõe sozinho —
+        // tilemap ainda vazio ele nasce sem nada e não se recompõe sozinho -
         // o chão fica atravessável e nada na tela denuncia.
         var topo = AssetDatabase.LoadAssetAtPath<Tile>(TileSetup.CaminhoTopo);
         var miolo = AssetDatabase.LoadAssetAtPath<Tile>(TileSetup.CaminhoMiolo);
         if (topo == null || miolo == null)
-            Debug.LogError("[Kaida] Tiles não encontrados — rode 'Kaida/4. Gerar tiles' antes.");
+            Debug.LogError("[Kaida] Tiles não encontrados - rode 'Kaida/4. Gerar tiles' antes.");
 
         for (int linha = 0; linha < altura; linha++)
         {
@@ -822,7 +845,7 @@ public static class SceneBuilder
         chapado.transform.position = new Vector3(largura * 0.5f, altura * 0.5f, 30f);
 
         // camada 1: céu inteiro atrás. Ele só vai aparecer nos vãos entre as
-        // folhas das camadas de mata — como um pedaço de luz entre as copas,
+        // folhas das camadas de mata - como um pedaço de luz entre as copas,
         // nunca como uma faixa aberta.
         var ceu = PrefabBuilder.SpriteSimples(r.fundo);
         if (ceu != null)
@@ -849,7 +872,7 @@ public static class SceneBuilder
             // de todas se alinharem numa faixa horizontal atravessando a tela.
             // As cores das camadas ficam próximas entre si de propósito. Com
             // contraste alto, o retângulo de cada cópia aparece como um bloco
-            // escuro no fundo — e o jogador tenta pular em cima dele achando
+            // escuro no fundo - e o jogador tenta pular em cima dele achando
             // que é plataforma.
             var baseDaMata = Color.Lerp(CorProfunda(r), r.tint, 0.30f);
 
@@ -898,7 +921,7 @@ public static class SceneBuilder
         if (tamanho.x <= 0.01f || tamanho.y <= 0.01f) return;
 
         // Passo exato, sem sobreposição. Sobrepor sprites com transparência
-        // soma o alfa nas emendas e cria faixas visíveis — pior do que a
+        // soma o alfa nas emendas e cria faixas visíveis - pior do que a
         // fresta que a sobreposição tentava evitar. Se sobrar uma fresta de
         // subpixel, quem aparece atrás é a camada seguinte de mata.
         float passoX = tamanho.x;
@@ -924,7 +947,7 @@ public static class SceneBuilder
         parallax.travarVertical = true;
     }
 
-    /// <summary>Cor do vazio absoluto da região — o que fica atrás de tudo.</summary>
+    /// <summary>Cor do vazio absoluto da região - o que fica atrás de tudo.</summary>
     static Color CorProfunda(Regiao r)
     {
         if (r.arquivo.StartsWith("04_")) return new Color(0.05f, 0.07f, 0.10f);  // caverna
@@ -1021,6 +1044,14 @@ public static class SceneBuilder
         var conteudo = new GameObject("Conteudo");
         var pontosDeEco = new List<Transform>();
 
+        if (r.pocoDeEscalada.width > 0f)
+        {
+            var poco = new GameObject("PocoDeEscalada");
+            poco.transform.SetParent(conteudo.transform);
+            poco.transform.position = r.pocoDeEscalada.center;
+            poco.AddComponent<PocoDeEscalada>().area = r.pocoDeEscalada;
+        }
+
         for (int linha = 0; linha < altura; linha++)
         {
             for (int coluna = 0; coluna < largura; coluna++)
@@ -1116,7 +1147,7 @@ public static class SceneBuilder
         if (regiao.StartsWith("01_"))
             return "\"Acordei na orla sem saber o próprio nome.\nA espada nas costas parecia me conhecer\nmelhor do que eu.\"";
         if (regiao.StartsWith("02_"))
-            return "\"A floresta guardava a memória do povo.\nQuando o Esquecimento veio, ela escureceu\nprimeiro — como quem fecha os olhos.\"";
+            return "\"A floresta guardava a memória do povo.\nQuando o Esquecimento veio, ela escureceu\nprimeiro - como quem fecha os olhos.\"";
         if (regiao.StartsWith("03_"))
             return "\"Tiravam lúmen daqui. Diziam que a pedra\nsegurava lembranças. Ninguém perguntou\nde quem eram.\"";
         return "\"Parar também é uma forma de esquecer.\"";
