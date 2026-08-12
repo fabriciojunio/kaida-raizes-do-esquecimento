@@ -6,7 +6,7 @@ using UnityEngine.UI;
 ///
 /// É exigência da entrega: assets de terceiros podem ser usados desde que
 /// sejam gratuitos ou licenciados e que a fonte apareça numa tela de
-/// créditos dentro do próprio jogo — não basta citar no relatório.
+/// créditos dentro do próprio jogo - não basta citar no relatório.
 /// </summary>
 public class CreditosUI : MonoBehaviour
 {
@@ -55,21 +55,25 @@ public class CreditosUI : MonoBehaviour
         painel.transform.SetParent(transform, false);
 
         var fundo = painel.AddComponent<Image>();
-        fundo.color = new Color(0.04f, 0.05f, 0.08f, 0.97f);
+        // opaco de vez: com 0,97 o título do menu aparecia por trás do texto
+        fundo.color = new Color(0.04f, 0.05f, 0.08f, 1f);
         var rt = painel.GetComponent<RectTransform>();
         rt.anchorMin = Vector2.zero;
         rt.anchorMax = Vector2.one;
         rt.offsetMin = Vector2.zero;
         rt.offsetMax = Vector2.zero;
 
-        UIKit.Titulo(painel.transform, "CRÉDITOS", 30, new Vector2(0f, 150f));
+        UIKit.Titulo(painel.transform, "CRÉDITOS", 24, new Vector2(0f, 156f));
 
+        // A tela toda tem 360 de altura de referência. Do fim do título até o
+        // topo do botão sobram cerca de 250, e o texto precisa caber aí: em 12
+        // ele passava de 350 e escorria por cima do "Voltar".
         corpo = UIKit.Paragrafo(painel.transform, MontarTexto(),
-                                new Vector2(0f, 122f), new Vector2(560f, 250f), 12);
+                                new Vector2(0f, 132f), new Vector2(600f, 244f), 11);
         corpo.alignment = TextAnchor.UpperCenter;
         corpo.color = UIKit.CorTexto;
 
-        var voltar = UIKit.Coluna(painel.transform, new Vector2(0f, -128f), 180f, 8f);
+        var voltar = UIKit.Coluna(painel.transform, new Vector2(0f, -112f), 180f, 8f);
         UIKit.Botao(voltar, "Voltar", Fechar);
 
         UIKit.Rodape(painel.transform, "Esc para voltar");
@@ -78,26 +82,19 @@ public class CreditosUI : MonoBehaviour
     string MontarTexto()
     {
         return
-            "KAIDA — RAÍZES DO ESQUECIMENTO\n" +
             "Metroidvania 2D · Unity 2022.3\n" +
+            "Desenvolvimento de Jogos Digitais · Ciência da Computação\n" +
             "\n" +
             "DESENVOLVIMENTO\n" +
             equipe + "\n" +
             "\n" +
             "ARTE\n" +
-            "Legacy Fantasy — High Forest, de Anokolisa\n" +
-            "anokolisa.itch.io · gratuito, uso comercial permitido\n" +
-            "Personagem, inimigos, tiles, árvores, construções e HUD\n" +
-            "\n" +
-            "Stringstar Fields\n" +
-            "Fundos da Caverna Musgosa e do Santuário Esquecido\n" +
+            "Legacy Fantasy - High Forest, de Anokolisa (anokolisa.itch.io)\n" +
+            "Gratuito, uso comercial permitido. Personagem, inimigos,\n" +
+            "tiles, árvores, construções e ícones da interface.\n" +
+            "Stringstar Fields - fundos da Caverna e do Santuário.\n" +
             "\n" +
             "TRILHA SONORA\n" +
-            "Gerada por síntese no próprio jogo, sem áudio de terceiros\n" +
-            "Escala menor, arpejo e baixo sustentado, com tônica\n" +
-            "diferente para cada região\n" +
-            "\n" +
-            "Disciplina de Desenvolvimento de Jogos Digitais\n" +
-            "Ciência da Computação";
+            "Gerada por síntese no próprio jogo, sem áudio de terceiros.";
     }
 }
