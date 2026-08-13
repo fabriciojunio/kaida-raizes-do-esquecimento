@@ -188,9 +188,13 @@ tela final mostra o balanço da jornada - fragmentos encontrados, nódulos
 reunidos e habilidades despertadas - e oferece jogar de novo ou voltar ao
 menu.
 
-**Derrota:** a vida chega a zero. A tela de morte conta as quedas da sessão
-e deixa voltar ao último marco ou ao menu. Não há limite de tentativas nem
-perda de progresso.
+**Derrota:** a vida chega a zero. São **três tentativas por partida**.
+Enquanto sobrar alguma, voltar ao último marco devolve a vida cheia e mantém
+habilidades e itens. Esgotadas as três, a tela de morte troca de cara: o
+botão de voltar ao marco some e a única saída é recomeçar do início, com o
+save apagado.
+
+A HUD mostra as tentativas restantes ao lado da vida, em vermelho na última.
 
 ## 11. Estilo de arte
 
@@ -307,4 +311,4 @@ fica desativado enquanto não existe um save.
 5. Durante a abertura, o Guardião é intocável.
 6. O Guardião não invoca inimigos: quem está na arena está no mapa.
 7. Morrer devolve ao último marco tocado, sem perder habilidades ou itens.
-8. Não há limite de tentativas.
+8. São três tentativas por partida; esgotadas, o jogo recomeça do início.

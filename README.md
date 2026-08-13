@@ -80,6 +80,7 @@ Orla da Vila → Floresta Silente → Lago Silente → Caverna Musgosa → Santu
 - **Três dificuldades**, escolhidas ao começar a partida, que mudam vida,
   invulnerabilidade e o comportamento dos inimigos
 - **Colecionáveis**: fragmentos de lore e nódulos que aumentam a vida máxima
+- **Três tentativas por partida**: esgotadas, o jogo recomeça do início
 - **Save automático** nos marcos de descanso
 
 ## Documentação
