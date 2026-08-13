@@ -9,7 +9,7 @@ public class BossHealthUI : MonoBehaviour
 {
     public GuardianBoss boss;
 
-    Image preenchimento;
+    RectTransform preenchimento;
     Text rotulo;
     CanvasGroup grupo;
 
@@ -32,10 +32,20 @@ public class BossHealthUI : MonoBehaviour
         boss.Morreu -= AoMorrer;
     }
 
+    /// <summary>
+    /// Encolhe a barra pela largura do próprio retângulo.
+    ///
+    /// Antes isto usava Image.fillAmount, que só tem efeito quando a Image
+    /// tem um sprite. A barra é desenhada por código, sem sprite nenhum, e
+    /// por isso aparecia sempre cheia: dava para bater no chefe a luta
+    /// inteira sem ver um pixel de diferença.
+    /// </summary>
     void AoMudarVida(int atual, int max)
     {
         if (preenchimento == null) return;
-        preenchimento.fillAmount = max > 0 ? (float)atual / max : 0f;
+        float fracao = max > 0 ? Mathf.Clamp01((float)atual / max) : 0f;
+        preenchimento.anchorMin = new Vector2(0f, 0f);
+        preenchimento.anchorMax = new Vector2(fracao, 1f);
     }
 
     void AoMorrer()
@@ -60,17 +70,26 @@ public class BossHealthUI : MonoBehaviour
         var fundo = painel.AddComponent<Image>();
         fundo.color = new Color(0.06f, 0.06f, 0.09f, 0.85f);
 
+        // trilho fixo, para a barra ter contra o que encolher
+        var trilhoGO = new GameObject("Trilho", typeof(RectTransform));
+        trilhoGO.transform.SetParent(painel.transform, false);
+        var trilhoImg = trilhoGO.AddComponent<Image>();
+        trilhoImg.color = new Color(0.16f, 0.13f, 0.10f, 0.9f);
+        var trt2 = trilhoGO.GetComponent<RectTransform>();
+        trt2.anchorMin = Vector2.zero;
+        trt2.anchorMax = Vector2.one;
+        trt2.offsetMin = new Vector2(3f, 3f);
+        trt2.offsetMax = new Vector2(-3f, -3f);
+
         var barraGO = new GameObject("Preenchimento", typeof(RectTransform));
-        barraGO.transform.SetParent(painel.transform, false);
-        preenchimento = barraGO.AddComponent<Image>();
-        preenchimento.color = new Color(0.95f, 0.75f, 0.35f);
-        preenchimento.type = Image.Type.Filled;
-        preenchimento.fillMethod = Image.FillMethod.Horizontal;
-        var brt = barraGO.GetComponent<RectTransform>();
-        brt.anchorMin = Vector2.zero;
-        brt.anchorMax = Vector2.one;
-        brt.offsetMin = new Vector2(3f, 3f);
-        brt.offsetMax = new Vector2(-3f, -3f);
+        barraGO.transform.SetParent(trilhoGO.transform, false);
+        var barraImg = barraGO.AddComponent<Image>();
+        barraImg.color = new Color(0.95f, 0.75f, 0.35f);
+        preenchimento = barraGO.GetComponent<RectTransform>();
+        preenchimento.anchorMin = Vector2.zero;
+        preenchimento.anchorMax = Vector2.one;
+        preenchimento.offsetMin = Vector2.zero;
+        preenchimento.offsetMax = Vector2.zero;
 
         var textoGO = new GameObject("Rotulo", typeof(RectTransform));
         textoGO.transform.SetParent(painel.transform, false);
