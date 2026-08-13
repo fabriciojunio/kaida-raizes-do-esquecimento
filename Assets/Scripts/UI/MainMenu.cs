@@ -51,12 +51,16 @@ public class MainMenu : MonoBehaviour
         if (SaveSystem.Instance != null) SaveSystem.Instance.DeleteSave();
         else DeletarSaveSemInstancia();
 
+        if (GameManager.Instance != null) GameManager.Instance.ReiniciarVidas();
+
         SceneManager.LoadScene("01_OrlaDaVila");
     }
 
     void Continuar()
     {
         if (SaveSystem.Instance != null) SaveSystem.Instance.LoadGame();
+        // as tentativas valem por partida, e continuar é uma partida nova
+        if (GameManager.Instance != null) GameManager.Instance.ReiniciarVidas();
         SceneManager.LoadScene("01_OrlaDaVila");
     }
 
