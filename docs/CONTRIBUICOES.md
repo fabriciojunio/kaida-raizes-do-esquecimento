@@ -4,8 +4,8 @@
 > cada um fez de fato. O professor avalia a distribuição de tarefas e pede
 > que cada integrante apresente suas contribuições na defesa oral.
 
-**Equipe:** Fabrício Júnio Almeida Dias · Camila Pereira Raimundo ·
-Luan Miranda Padilha · Kauã Limão Nunes
+**Equipe:** Camila Pereira Raimundo · Fabrício Júnio Almeida Dias ·
+Kauã Limão Nunes · Luan Miranda Padilha
 
 ## Áreas do projeto
 
@@ -22,7 +22,7 @@ movimento com gravidade assimétrica, pulo de altura variável, dash com
 invulnerabilidade, coyote time e jump buffer. Configuração de balanceamento
 em `PlayerStats`.
 
-**Responsável:** _______________________
+**Responsável:** Camila Pereira Raimundo
 
 ### 2. Inimigos e chefe
 
@@ -32,7 +32,7 @@ Inimigo base com patrulha, detecção por linha de visão e dano por contato.
 Três comportamentos derivados (javali, abelha, caracol) e o Guardião do
 Lúmen, com máquina de estados própria e barra de vida única.
 
-**Responsável:** _______________________
+**Responsável:** Fabrício Júnio Almeida Dias
 
 ### 3. Mundo, progressão e save
 
@@ -41,7 +41,7 @@ Lúmen, com máquina de estados própria e barra de vida única.
 Checkpoints, transições entre regiões com ponto de chegada, coletáveis,
 perigos, parallax, sistema de save em JSON e controle de dificuldade.
 
-**Responsável:** _______________________
+**Responsável:** Kauã Limão Nunes
 
 ### 4. Interface e áudio
 
@@ -51,7 +51,7 @@ Menu principal com cenário desfocado ao fundo, menu de pausa, telas de
 morte e vitória, HUD de vida, barra do chefe, tela de créditos e a trilha
 sonora gerada por síntese.
 
-**Responsável:** _______________________
+**Responsável:** Luan Miranda Padilha
 
 ### 5. Level design e geração de cenas
 
@@ -61,7 +61,7 @@ Pipeline que monta o jogo por código: fatiamento de sprites com detecção de
 frames, geração de animações e prefabs, recorte de tiles e construção das
 seis cenas a partir de mapas em texto.
 
-**Responsável:** _______________________
+**Responsável:** Camila Pereira Raimundo
 
 ### 6. Testes e qualidade
 
@@ -70,7 +70,7 @@ seis cenas a partir de mapas em texto.
 138 casos automatizados em EditMode e PlayMode, incluindo o validador de
 alcance dos mapas e os testes de colisão do chão nas cenas reais.
 
-**Responsável:** _______________________
+**Responsável:** Fabrício Júnio Almeida Dias
 
 ## Sugestão de fala na apresentação
 
