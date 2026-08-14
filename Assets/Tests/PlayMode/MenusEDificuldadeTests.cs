@@ -93,8 +93,16 @@ public class MenusEDificuldadeTests
         var kaida = CenarioDeTeste.CriarKaida(new Vector2(0f, 1f));
         yield return null;
 
-        Assert.AreEqual(3, kaida.stats.maxHealth, "no difícil a vida máxima é 3");
-        Assert.AreEqual(3, kaida.health, "e ela nasce com a vida cheia dessa dificuldade");
+        // A vida esperada sai do próprio GameSettings, e não de um número
+        // escrito aqui: o balanceamento muda, e um teste que fixa o valor passa
+        // a reprovar o rebalanceamento em vez de reprovar defeito.
+        var esperado = CenarioDeTeste.StatsPadrao();
+        GameSettings.Aplicar(esperado);
+
+        Assert.AreEqual(esperado.maxHealth, kaida.stats.maxHealth,
+            "a dificuldade escolhida não chegou nos stats da personagem");
+        Assert.AreEqual(esperado.maxHealth, kaida.health,
+            "e ela nasce com a vida cheia dessa dificuldade");
     }
 
     [UnityTest]
@@ -110,7 +118,11 @@ public class MenusEDificuldadeTests
         var kaida = CenarioDeTeste.CriarKaida(new Vector2(0f, 1f), original);
         yield return null;
 
-        Assert.AreEqual(7, kaida.stats.maxHealth, "a cópia recebeu a dificuldade fácil");
+        var esperado = CenarioDeTeste.StatsPadrao();
+        GameSettings.Aplicar(esperado);
+
+        Assert.AreEqual(esperado.maxHealth, kaida.stats.maxHealth,
+            "a cópia recebeu a dificuldade fácil");
         Assert.AreEqual(5, original.maxHealth, "o asset original não pode ter sido tocado");
         Assert.AreNotSame(original, kaida.stats, "a Kaida precisa usar uma cópia");
     }
