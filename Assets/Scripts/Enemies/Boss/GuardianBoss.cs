@@ -49,6 +49,8 @@ public class GuardianBoss : MonoBehaviour, IDamageable
     {
         rb = GetComponent<Rigidbody2D>();
         if (rb != null) { rb.gravityScale = 0f; rb.freezeRotation = true; }
+        // a dificuldade encolhe a barra do chefe junto com o resto
+        maxHealth = Mathf.Max(1, Mathf.RoundToInt(maxHealth * GameSettings.VidaDoChefe()));
         Health = maxHealth;
 
         Machine = new StateMachine();

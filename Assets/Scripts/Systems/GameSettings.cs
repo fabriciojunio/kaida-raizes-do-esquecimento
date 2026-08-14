@@ -73,9 +73,9 @@ public static class GameSettings
             case Dificuldade.Facil:
                 return "Mais vida e uma janela de recuperação longa.\nPara conhecer o vale sem pressa.";
             case Dificuldade.Dificil:
-                return "Pouca vida, recuperação curta, inimigos mais rápidos.\nCada erro custa caro.";
+                return "Pouca vida, recuperação curta, inimigos mais rápidos\ne o chefe com a vida cheia. Cada erro custa caro.";
             default:
-                return "O jogo como foi balanceado.";
+                return "Vida folgada e boa janela de recuperação.\nA caminhada inteira sem cobrar demais.";
         }
     }
 
@@ -88,23 +88,28 @@ public static class GameSettings
     {
         if (stats == null) return;
 
+        // Rebalanceado depois de jogar: o Normal estava cobrando como
+        // dificuldade alta. Cinco de vida com um segundo de invulnerabilidade
+        // não dá margem para aprender o padrão de um inimigo - o jogador leva
+        // o segundo golpe antes de entender o primeiro. O que subiu mais foi a
+        // janela de recuperação, que é o que dá tempo de sair de perto.
         switch (Atual)
         {
             case Dificuldade.Facil:
-                stats.maxHealth = 7;
-                stats.invulnTime = 1.5f;
-                stats.dashCooldown *= 0.8f;
+                stats.maxHealth = 9;
+                stats.invulnTime = 1.9f;
+                stats.dashCooldown *= 0.75f;
                 break;
 
             case Dificuldade.Dificil:
-                stats.maxHealth = 3;
-                stats.invulnTime = 0.65f;
-                stats.dashCooldown *= 1.2f;
+                stats.maxHealth = 4;
+                stats.invulnTime = 0.85f;
+                stats.dashCooldown *= 1.15f;
                 break;
 
             default:
-                stats.maxHealth = 5;
-                stats.invulnTime = 1.0f;
+                stats.maxHealth = 7;
+                stats.invulnTime = 1.35f;
                 break;
         }
     }
@@ -114,9 +119,9 @@ public static class GameSettings
     {
         switch (Atual)
         {
-            case Dificuldade.Facil:   return 0.85f;
-            case Dificuldade.Dificil: return 1.25f;
-            default:                  return 1f;
+            case Dificuldade.Facil:   return 0.75f;
+            case Dificuldade.Dificil: return 1.2f;
+            default:                  return 0.88f;
         }
     }
 
@@ -125,9 +130,26 @@ public static class GameSettings
     {
         switch (Atual)
         {
-            case Dificuldade.Facil:   return 0.8f;
+            case Dificuldade.Facil:   return 0.7f;
             case Dificuldade.Dificil: return 1.3f;
-            default:                  return 1f;
+            default:                  return 0.85f;
+        }
+    }
+
+    /// <summary>
+    /// Quanto da vida cheia o chefe usa.
+    ///
+    /// A luta final é longa por natureza: chegar até lá já custou a caminhada
+    /// inteira, e um confronto que se arrasta transforma erro em recomeço caro.
+    /// No Normal ele perde um quinto da vida.
+    /// </summary>
+    public static float VidaDoChefe()
+    {
+        switch (Atual)
+        {
+            case Dificuldade.Facil:   return 0.65f;
+            case Dificuldade.Dificil: return 1f;
+            default:                  return 0.8f;
         }
     }
 }
